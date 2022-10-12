@@ -17,7 +17,6 @@ class Image{
 public:
     uint8_t pixels[IMAGE_HEIGHT* IMAGE_WIDTH];
     explicit Image(const uint8_t* bytes);
-    bool on_positive_side(const Hyperplane& h) const;
 };
 
 class Pattern{
@@ -29,15 +28,18 @@ public:
 
 class Dataset{
 public:
-    set<Pattern> patterns;
+    vector<Pattern> patterns;
     explicit Dataset(const vector<Image>& images, const vector<label>& labels);
     bool contains_label(label l) const;
-    void remove_patterns(const set<Pattern>& to_remove);
+    //void remove_patterns(const set<Pattern>& to_remove);
 };
 
 class Perceptron{
+private:
+    Hyperplane h;
+    bool on_positive_side;
 public:
-    Perceptron(Hyperplane h, bool on_positive_side);
+    Perceptron(Hyperplane  h, bool on_positive_side);
 };
 
 // mapuje labele na wektory perceptronów, które ją mają rozpoznawać
@@ -52,7 +54,8 @@ Dataset read_test_dataset();
 
 PerceptronNetwork create_for_dataset(const Dataset& test_dataset);
 
-
 vector<Perceptron> create_to_recognize(label l);
+
+Hyperplane lead_through(const vector<Pattern>& patterns);
 
 #endif //PERCEPTRON_PERCEPTRON_H

@@ -11,6 +11,4 @@ pixels{0}
     }
 }
 
-bool Image::on_positive_side(const Hyperplane &h) const {
-    // todo;
-}
+

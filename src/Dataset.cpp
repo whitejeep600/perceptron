@@ -7,7 +7,7 @@ patterns()
 {
     assert(images.size() == labels.size());
     for(uint32_t i = 0; i < images.size(); ++i){
-        patterns.emplace(images[0], labels[0]);
+        patterns.emplace_back(images[0], labels[0]);
     }
 }
 
@@ -20,7 +20,7 @@ bool Dataset::contains_label(label l) const {
     return false;
 }
 
-void Dataset::remove_patterns(const set<Pattern>& to_remove){
-    // todo
-}
+//void Dataset::remove_patterns(const set<Pattern>& to_remove){
+//    // todo
+//}
 
