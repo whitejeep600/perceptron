@@ -81,3 +81,10 @@ std::vector<Image> read_train_images(){
 std::vector<Image> read_test_images(){
     return read_images("../data/test_images", 10000);
 }
+
+Dataset read_train_dataset(){
+    return Dataset(read_train_images(), read_train_labels());
+}
+Dataset read_test_dataset(){
+    return Dataset(read_test_images(), read_test_labels());
+}
