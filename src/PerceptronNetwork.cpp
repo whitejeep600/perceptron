@@ -2,6 +2,8 @@
 #include "perceptron.h"
 #include "hyperplane.h"
 #include "eigen/Eigen/Dense"
+// I ended up using this library for matrix inversions.
+// Surprisingly no more 'normal' library is available
 
 using namespace std;
 
@@ -10,12 +12,32 @@ set<Pattern> get_nearest_with_different_label(const Pattern& pattern, uint32_t h
     // todo
 }
 
-// Let the plane equation be sum(alpha_n * x_n = 1
+// Let the plane equation in n dimensions be sum(c_n * x_n = 1) (this is assuming that
+// zero does not belong to the plane but that is extremely unlikely to happen). Then let c
+// be the vector of c_i. We are given a set of vectors belonging to that plane. If we
+// assemble these vectors into matrix A so that each vector becomes a row, c satisfies
+// Ax = 1 (vector of ones). Then x = A^{-1} * 1.
 Hyperplane lead_through(const set<Pattern>& patterns){
-    auto m = Eigen::Matrix<double, IMAGE_HEIGHT, IMAGE_WIDTH>(IMAGE_HEIGHT, IMAGE_WIDTH);
+    auto A = Eigen::Matrix<double, IMAGE_HEIGHT, IMAGE_WIDTH>();
+    uint32_t row = 0;
     assert(patterns.size() == IMAGE_HEIGHT);
-    return {};
-    // todo
+    for(auto p: patterns){
+        for(uint32_t column = 0; column < IMAGE_WIDTH; ++column){
+            A(row, column) = p.image.pixels[column];
+        }
+        ++row;
+    }
+    auto A_inverted = A.inverse();
+    auto ones = Eigen::Matrix<double, IMAGE_HEIGHT, 1>();
+    for(uint32_t vector_row = 0; vector_row < IMAGE_HEIGHT; ++vector_row){
+        ones(vector_row, 1) = 1;
+    }
+    Eigen::Matrix<double, IMAGE_HEIGHT, 1> coefficients_eigen_vector = A_inverted * ones;
+    vector<double> coefficients_vector;
+    for(uint32_t vector_row = 0; vector_row < IMAGE_HEIGHT; ++vector_row){
+        coefficients_vector.push_back(coefficients_eigen_vector(vector_row, 1));
+    }
+    return {coefficients_vector, 1};
 }
 
 set<Pattern> get_with_same_side_and_label(const Pattern& p, const Hyperplane h){
