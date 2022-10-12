@@ -7,7 +7,16 @@
 using namespace std;
 using label = uint8_t;
 
-class Image;
+const uint32_t IMAGE_HEIGHT = 28;
+const uint32_t IMAGE_WIDTH = 28;
+const uint32_t IMAGE_SIZE =  IMAGE_HEIGHT * IMAGE_WIDTH;
+
+class Image{
+private:
+    uint8_t pixels[IMAGE_HEIGHT][IMAGE_WIDTH];
+public:
+    explicit Image(const uint8_t* bytes);
+};
 class Sample;
 class Dataset;
 class PerceptronNetwork{
@@ -15,7 +24,11 @@ public:
     // void test_on_dataset(Dataset test_dataset);
 };
 
-std::vector<label> read_labels(const char* filename);
+std::vector<label> read_train_labels();
+std::vector<label> read_test_labels();
+
+std::vector<Image> read_train_images();
+std::vector<Image> read_test_images();
 
 Dataset read_train_dataset();
 Dataset read_test_dataset();
