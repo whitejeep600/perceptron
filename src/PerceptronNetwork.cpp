@@ -1,4 +1,5 @@
 #include <iostream>
+#include <utility>
 #include "perceptron.h"
 #include "hyperplane.h"
 #include "../eigen/Eigen/Dense"
@@ -7,10 +8,31 @@
 
 using namespace std;
 
-//set<Pattern> get_nearest_with_different_label(const Pattern& pattern, uint32_t how_many){
-//    return {};
-//    // todo
-//}
+vector<Pattern> get_nearest_with_different_label(const Pattern& pattern, uint32_t how_many, Dataset& dataset){
+    struct key
+    {
+        Pattern target_pattern;
+        explicit key(Pattern  p): target_pattern(p){}
+        bool operator() (const Pattern& pattern1, const Pattern& pattern2) const
+        {
+            return (pattern1.image.euclidean_distance_squared(target_pattern.image) <
+                    pattern2.image.euclidean_distance_squared(target_pattern.image));
+        }
+    };
+    auto sort_key = key(pattern);
+    std::sort(dataset.patterns.begin(), dataset.patterns.end(), sort_key);
+    auto result = vector<Pattern>();
+    uint32_t found = 0;
+    uint32_t i = 0;
+    while(found < how_many){
+        if(dataset.patterns[i].l != pattern.l){
+            result.push_back(dataset.patterns[i]);
+            ++found;
+        }
+        ++i;
+    }
+    return result;
+}
 
 // Let the plane equation in n dimensions be sum(c_n * x_n = 1) (this is assuming that
 // zero does not belong to the plane but that is extremely unlikely to happen). Then let c
@@ -53,17 +75,17 @@ Hyperplane lead_through(const vector<Pattern>& patterns){
 //
 //// Create a vector of perceptrons to recognize label l based on the dataset. If any of the
 //// resulting perceptrons light up for a pattern, it will be assigned the label l.
-//vector<Perceptron> create_to_recognize(label l, Dataset& dataset){
+//vector<Perceptron> create_to_recognize(label l, Dataset dataset){
 //    vector<Perceptron> result;
 //    Hyperplane h;
-//    set<Pattern> nearest_different_label;
-//    set<Pattern> same_side_and_label;
-//    set<Pattern> biggest_same_side_and_label;
+//    vector<Pattern> nearest_different_label;
+//    vector<Pattern> same_side_and_label;
+//    vector<Pattern> biggest_same_side_and_label;
 //    Hyperplane associated_with_biggest;
 //    while(dataset.contains_label(l)){
 //        for(auto pattern: dataset.patterns){
 //            if(pattern.l == l){
-//                nearest_different_label = get_nearest_with_different_label(pattern, 784);
+//                nearest_different_label = get_nearest_with_different_label(pattern, 784, dataset);
 //                h = lead_through(nearest_different_label);
 //                same_side_and_label = get_with_same_side_and_label(pattern, h, dataset);
 //                if(same_side_and_label.size() > biggest_same_side_and_label.size()){

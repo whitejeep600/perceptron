@@ -20,6 +20,11 @@ bool Dataset::contains_label(label l) const {
     return false;
 }
 
+Dataset::Dataset(const vector<Pattern> &patterns)
+:
+patterns(patterns)
+{}
+
 //void Dataset::remove_patterns(const set<Pattern>& to_remove){
 //    // todo
 //}

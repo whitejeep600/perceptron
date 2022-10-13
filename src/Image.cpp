@@ -11,4 +11,21 @@ pixels{0}
     }
 }
 
+double Image::euclidean_distance_squared(const Image &that) const {
+    double result = 0;
+    double temp;
+    for(uint32_t i = 0; i < IMAGE_SIZE; ++i){
+        temp = (this->pixels[i] - that.pixels[i]);
+        result += temp*temp;
+    }
+    return result;
+}
+
+bool Image::operator==(const Image& that) const{
+    for(uint32_t i = 0; i < IMAGE_SIZE; ++i){
+        if(this->pixels[i] != that.pixels[i]) return false;
+    }
+    return true;
+}
+
 

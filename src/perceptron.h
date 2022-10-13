@@ -17,19 +17,23 @@ class Image{
 public:
     uint8_t pixels[IMAGE_HEIGHT* IMAGE_WIDTH];
     explicit Image(const uint8_t* bytes);
+    double euclidean_distance_squared(const Image& image2) const;
+    bool operator==(const Image& that) const;
 };
 
 class Pattern{
 public:
-    const Image image;
-    const label l;
+    Image image;
+    label l;
     explicit Pattern(const Image& image, label l);
+    bool operator==(const Pattern& that) const;
 };
 
 class Dataset{
 public:
     vector<Pattern> patterns;
     explicit Dataset(const vector<Image>& images, const vector<label>& labels);
+    explicit Dataset(const vector<Pattern>& patterns);
     bool contains_label(label l) const;
     //void remove_patterns(const set<Pattern>& to_remove);
 };
@@ -56,6 +60,9 @@ PerceptronNetwork create_for_dataset(const Dataset& test_dataset);
 
 vector<Perceptron> create_to_recognize(label l);
 
+// todo niepotrzebne rzeczy z naglowkow do wywalenia
 Hyperplane lead_through(const vector<Pattern>& patterns);
+
+vector<Pattern> get_nearest_with_different_label(const Pattern& pattern, uint32_t how_many, Dataset& dataset);
 
 #endif //PERCEPTRON_PERCEPTRON_H

@@ -10,6 +10,7 @@ class Hyperplane{
 public:
     vector<double> coefficients_vector;
     double constant_term;
+    // the equation describing the hyperplane is coefficients_vector^{T} * x = constant_term
     //void move_halfway_to_point(const uint8_t point[784]);
     Hyperplane(const vector<double>& coefficients_vector, double constant_term);
     Hyperplane();

@@ -5,4 +5,4 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(CMAKE_CXX_FLAGS "-Wall -Wextra -Werror")
 
-add_executable(perceptron main.cpp perceptron.h Image.cpp Pattern.cpp Dataset.cpp readers.cpp PerceptronNetwork.cpp hyperplane.h Hyperplane.cpp Perceptron.cpp)
+add_executable(perceptron main.cpp perceptron.h Image.cpp Pattern.cpp Dataset.cpp readers.cpp PerceptronNetwork.cpp hyperplane.h Hyperplane.cpp Perceptron.cpp test.cpp test.h)
