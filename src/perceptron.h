@@ -19,6 +19,7 @@ public:
     explicit Image(const uint8_t* bytes);
     double euclidean_distance_squared(const Image& image2) const;
     bool operator==(const Image& that) const;
+    vector<double> to_algebraic_vector() const;
 };
 
 class Pattern{
@@ -64,5 +65,6 @@ vector<Perceptron> create_to_recognize(label l);
 Hyperplane lead_through(const vector<Pattern>& patterns);
 
 vector<Pattern> get_nearest_with_different_label(const Pattern& pattern, uint32_t how_many, Dataset& dataset);
+vector<Pattern> get_all_with_same_side_and_label(const Pattern& p, const Hyperplane& h, Dataset& dataset);
 
 #endif //PERCEPTRON_PERCEPTRON_H

@@ -64,7 +64,7 @@ Hyperplane lead_through(const vector<Pattern>& patterns){
     return {coefficients_vector, 1};
 }
 
-//set<Pattern> get_with_same_side_and_label(const Pattern& p, const Hyperplane h, Dataset& dataset){
+//vector<Pattern> get_with_same_side_and_label(const Pattern& p, const Hyperplane& h, Dataset& dataset){
 //    return {};
 //    // todo
 //}

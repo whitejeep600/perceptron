@@ -28,4 +28,12 @@ bool Image::operator==(const Image& that) const{
     return true;
 }
 
+vector<double> Image::to_algebraic_vector() const {
+    auto res = vector<double>();
+    for(unsigned char pixel : pixels){
+        res.push_back(pixel);
+    }
+    return res;
+}
+
 

@@ -1,4 +1,5 @@
 #include "hyperplane.h"
+#include "utils.h"
 
 //void Hyperplane::move_halfway_to_point(const uint8_t point[784]) {
 //        // todo
@@ -16,8 +17,8 @@ coefficients_vector(),
 constant_term(0)
 {}
 
-//bool Hyperplane::on_positive_side(const uint8_t *h) const {
-//    // todo
-//}
+bool Hyperplane::on_positive_side(const vector<double>& vec) const {
+    return dot_product(coefficients_vector, vec) > constant_term;
+}
 
 

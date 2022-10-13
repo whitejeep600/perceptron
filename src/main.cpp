@@ -4,6 +4,6 @@
 #include "test.h"
 
 int main() {
-    test();
+    test_get_with_same_side_and_label();
     return 0;
 }
