@@ -57,7 +57,7 @@ void test_get_nearest_with_different_label(){
 }
 
 // for this to work, both width and height = 3
-void test_get_with_same_side_and_label(){
+void test_get_with_same_side_and_label_and_get_nearest(){
     uint8_t bytes[9] = {1, 0, 0, 0, 0, 0, 0, 0, 0};
     auto image1 = Image(bytes);
 
@@ -119,5 +119,28 @@ void test_get_with_same_side_and_label(){
     assert(same_side.size() == 2);
     assert(vector_contains(same_side, close_same_label));
     assert(vector_contains(same_side, far_same_label));
-};
 
+    // testing get_nearest and Dataset.remove_patterns
+    auto nearest = get_nearest(dataset.patterns, h);
+    assert(nearest == other_side_same_label or nearest == other_side_different_label);
+    dataset.remove_patterns({nearest});
+
+    nearest = get_nearest(dataset.patterns, h);
+    assert(nearest == other_side_same_label or nearest == other_side_different_label);
+    dataset.remove_patterns({nearest});
+
+    nearest = get_nearest(dataset.patterns, h);
+    assert(nearest == close_same_label);
+    dataset.remove_patterns({nearest});
+
+    nearest = get_nearest(dataset.patterns, h);
+    assert(nearest == close_different_label);
+    dataset.remove_patterns({nearest});
+
+    nearest = get_nearest(dataset.patterns, h);
+    assert(nearest == far_same_label);
+    dataset.remove_patterns({nearest});
+
+    assert(dataset.patterns.empty());
+
+}

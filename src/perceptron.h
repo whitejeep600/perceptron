@@ -36,13 +36,13 @@ public:
     explicit Dataset(const vector<Image>& images, const vector<label>& labels);
     explicit Dataset(const vector<Pattern>& patterns);
     bool contains_label(label l) const;
-    //void remove_patterns(const set<Pattern>& to_remove);
+    void remove_patterns(const vector<Pattern>& to_remove);
 };
 
 class Perceptron{
 private:
     Hyperplane h;
-    bool on_positive_side;
+    bool recognizes_positive_side;
 public:
     Perceptron(Hyperplane  h, bool on_positive_side);
 };
@@ -66,5 +66,6 @@ Hyperplane lead_through(const vector<Pattern>& patterns);
 
 vector<Pattern> get_nearest_with_different_label(const Pattern& pattern, uint32_t how_many, Dataset& dataset);
 vector<Pattern> get_all_with_same_side_and_label(const Pattern& p, const Hyperplane& h, Dataset& dataset);
+Pattern get_nearest(vector<Pattern>& patterns, const Hyperplane& h);
 
 #endif //PERCEPTRON_PERCEPTRON_H

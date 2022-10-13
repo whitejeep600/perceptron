@@ -12,7 +12,7 @@ vector<Pattern> get_nearest_with_different_label(const Pattern& pattern, uint32_
     struct key
     {
         Pattern target_pattern;
-        explicit key(Pattern  p): target_pattern(p){}
+        explicit key(Pattern p): target_pattern(p){}
         bool operator() (const Pattern& pattern1, const Pattern& pattern2) const
         {
             return (pattern1.image.euclidean_distance_squared(target_pattern.image) <
@@ -50,8 +50,6 @@ Hyperplane lead_through(const vector<Pattern>& patterns){
         ++row;
     }
     auto A_inverted = A.inverse();
-    cout << A << "\n";
-    cout << A_inverted;
     auto ones = Eigen::Matrix<double, IMAGE_HEIGHT, 1>();
     for(uint32_t vector_row = 0; vector_row < IMAGE_HEIGHT; ++vector_row){
         ones(vector_row, 0) = 1;
@@ -75,9 +73,21 @@ vector<Pattern> get_all_with_same_side_and_label(const Pattern& target, const Hy
     return result;
 }
 //
-//Pattern get_nearest(const set<Pattern>& patterns, const Hyperplane h){
-//    // todo
-//}
+Pattern get_nearest(vector<Pattern>& patterns, const Hyperplane& h){
+    struct key
+    {
+        Hyperplane target_hyperplane;
+        explicit key(Hyperplane h): target_hyperplane(std::move(h)){}
+        bool operator() (const Pattern& pattern1, const Pattern& pattern2) const
+        {
+            return (target_hyperplane.distance_to_point(pattern1.image.to_algebraic_vector()) <
+                    target_hyperplane.distance_to_point(pattern2.image.to_algebraic_vector()));
+        }
+    };
+    auto sort_key = key(h);
+    std::sort(patterns.begin(), patterns.end(), sort_key);
+    return patterns[0];
+}
 //
 //// Create a vector of perceptrons to recognize label l based on the dataset. If any of the
 //// resulting perceptrons light up for a pattern, it will be assigned the label l.

@@ -2,6 +2,6 @@
 #define PERCEPTRON_TEST_H
 
 void test_get_nearest_with_different_label();
-void test_get_with_same_side_and_label();
+void test_get_with_same_side_and_label_and_get_nearest();
 
 #endif //PERCEPTRON_TEST_H
