@@ -11,7 +11,8 @@ public:
     vector<double> coefficients_vector;
     double constant_term;
     // the equation describing the hyperplane is coefficients_vector^{T} * x = constant_term
-    //void move_halfway_to_point(const uint8_t point[784]);
+    void translate_by_vector(const vector<double>& translation_vector);
+    void move_halfway_to_point(const vector<double>&  vec);
     Hyperplane(const vector<double>& coefficients_vector, double constant_term);
     Hyperplane();
     bool on_positive_side(const vector<double>& vec) const;

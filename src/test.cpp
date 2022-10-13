@@ -57,7 +57,7 @@ void test_get_nearest_with_different_label(){
 }
 
 // for this to work, both width and height = 3
-void test_get_with_same_side_and_label_and_get_nearest(){
+void test_get_with_same_side_and_label_and_get_nearest_and_moving_hyperplane(){
     uint8_t bytes[9] = {1, 0, 0, 0, 0, 0, 0, 0, 0};
     auto image1 = Image(bytes);
 
@@ -143,4 +143,11 @@ void test_get_with_same_side_and_label_and_get_nearest(){
 
     assert(dataset.patterns.empty());
 
+    h.move_halfway_to_point(target_pattern.image.to_algebraic_vector());
+    auto expected_coefficients = vector<double>{1, 1, 1};
+    assert(h.coefficients_vector == expected_coefficients);
+    assert(h.constant_term == 3.5);
+    h.move_halfway_to_point(vector<double>{0, 0, 4.5});
+    assert(h.coefficients_vector == expected_coefficients);
+    assert(h.constant_term == 4);
 }

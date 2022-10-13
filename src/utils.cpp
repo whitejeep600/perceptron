@@ -17,3 +17,11 @@ double euclidean_norm(const vector<double>& vec){
     }
     return sqrt(res);
 }
+
+vector<double> mul_vector_by_scalar(vector<double> vec, double scalar){
+    transform(vec.begin(),
+              vec.end(),
+              vec.begin(),
+              [&scalar](double x){ return x * scalar; });
+    return vec;
+}

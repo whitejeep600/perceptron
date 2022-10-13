@@ -27,6 +27,7 @@ Dataset::Dataset(const vector<Pattern> &patterns)
 patterns(patterns)
 {}
 
+// I know this is ugly but using a hashset or something in cpp is pain :)
 void Dataset::remove_patterns(const vector<Pattern>& to_remove){
     uint32_t temp_size = 0;
     for(auto target: to_remove){
