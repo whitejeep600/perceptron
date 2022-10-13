@@ -113,6 +113,11 @@ void test_get_with_same_side_and_label(){
     assert(h.on_positive_side(far_same_label.image.to_algebraic_vector()));
     assert(not (h.on_positive_side(other_side_same_label.image.to_algebraic_vector())));
     assert(not (h.on_positive_side(other_side_different_label.image.to_algebraic_vector())));
-
+    auto dataset = Dataset({close_same_label, close_different_label, far_same_label, other_side_same_label,
+                           other_side_different_label});
+    auto same_side = get_all_with_same_side_and_label(target_pattern, h, dataset);
+    assert(same_side.size() == 2);
+    assert(vector_contains(same_side, close_same_label));
+    assert(vector_contains(same_side, far_same_label));
 };
 

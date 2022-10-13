@@ -15,6 +15,7 @@ public:
     Hyperplane(const vector<double>& coefficients_vector, double constant_term);
     Hyperplane();
     bool on_positive_side(const vector<double>& vec)const;
+    bool on_same_side(const vector<double>& vec1, const vector<double>& vec2)const;
 };
 
 

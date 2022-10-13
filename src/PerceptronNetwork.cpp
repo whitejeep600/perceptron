@@ -64,10 +64,16 @@ Hyperplane lead_through(const vector<Pattern>& patterns){
     return {coefficients_vector, 1};
 }
 
-//vector<Pattern> get_with_same_side_and_label(const Pattern& p, const Hyperplane& h, Dataset& dataset){
-//    return {};
-//    // todo
-//}
+vector<Pattern> get_all_with_same_side_and_label(const Pattern& target, const Hyperplane& h, Dataset& dataset){
+    vector<Pattern> result;
+    for(Pattern p: dataset.patterns){
+        if(p.l == target.l and h.on_same_side(target.image.to_algebraic_vector(),
+                                              p.image.to_algebraic_vector())){
+            result.push_back(p);
+        }
+    }
+    return result;
+}
 //
 //Pattern get_nearest(const set<Pattern>& patterns, const Hyperplane h){
 //    // todo
