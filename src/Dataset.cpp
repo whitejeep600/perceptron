@@ -9,7 +9,7 @@ patterns()
 {
     assert(images.size() == labels.size());
     for(uint32_t i = 0; i < images.size(); ++i){
-        patterns.emplace_back(images[0], labels[0]);
+        patterns.emplace_back(images[i], labels[i]);
     }
 }
 
@@ -39,4 +39,62 @@ void Dataset::remove_patterns(const vector<Pattern>& to_remove){
         }
     }
 }
+
+vector<Pattern> get_nearest_with_different_label(const Pattern& pattern, uint32_t how_many, Dataset& dataset){
+    struct key
+    {
+        Pattern target_pattern;
+        explicit key(Pattern p): target_pattern(p){}
+        bool operator() (const Pattern& pattern1, const Pattern& pattern2) const
+        {
+            return (pattern1.image.euclidean_distance_squared(target_pattern.image) <
+                    pattern2.image.euclidean_distance_squared(target_pattern.image));
+        }
+    };
+    auto sort_key = key(pattern);
+    std::sort(dataset.patterns.begin(), dataset.patterns.end(), sort_key);
+    auto result = vector<Pattern>();
+    uint32_t found = 0;
+    uint32_t i = 0;
+    while(found < how_many){
+        if(dataset.patterns[i].l != pattern.l){
+            result.push_back(dataset.patterns[i]);
+            ++found;
+        }
+        ++i;
+    }
+    return result;
+}
+
+// Let the plane equation in n dimensions be sum(c_n * x_n = 1) (this is assuming that
+// zero does not belong to the plane but that is extremely unlikely to happen). Then let c
+// be the vector of c_i. We are given a set of vectors belonging to that plane. If we
+// assemble these vectors into matrix A so that each vector becomes a row, c satisfies
+// Ax = 1 (vector of ones). Then x = A^{-1} * 1.
+Hyperplane lead_through(const vector<Pattern>& patterns){
+    auto A = std::make_unique<Eigen::Matrix<double, IMAGE_SIZE, IMAGE_SIZE>>();
+    uint32_t row = 0;
+    assert(patterns.size() == IMAGE_SIZE);
+    for(const auto& p: patterns){
+        for(uint32_t column = 0; column < IMAGE_SIZE; ++column){
+            (*A)(row, column) = p.image.pixels[column];
+        }
+        ++row;
+    }
+    auto A_inverted = std::make_unique<Eigen::Matrix<double, IMAGE_SIZE, IMAGE_SIZE>>((*A).inverse());
+    vector<double> coefficients_vector = sum_by_row(std::move(A_inverted));
+    return {coefficients_vector, 1};
+}
+
+// actually we could dump to file
+void Dataset::preprocess(label l) {
+    // This can be done only once for each pattern while training to recognize a single label.
+    for(Pattern& p: patterns){
+        if(p.l == l) {
+            vector<Pattern> nearest_different_label = get_nearest_with_different_label(p, 784, *this);
+            p.h = lead_through(nearest_different_label);
+        }
+    }
+}
+
 

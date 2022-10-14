@@ -26,6 +26,7 @@ class Pattern{
 public:
     Image image;
     label l;
+    Hyperplane h;
     explicit Pattern(const Image& image, label l);
     bool operator==(const Pattern& that) const;
 };
@@ -37,6 +38,7 @@ public:
     explicit Dataset(const vector<Pattern>& patterns);
     bool contains_label(label l) const;
     void remove_patterns(const vector<Pattern>& to_remove);
+    void preprocess(label l);
 };
 
 class Perceptron{
@@ -59,13 +61,14 @@ Dataset read_test_dataset();
 
 PerceptronNetwork create_for_dataset(const Dataset& test_dataset);
 
-vector<Perceptron> create_to_recognize(label l);
+vector<Perceptron> create_to_recognize(label l, Dataset dataset);
 
 // todo niepotrzebne rzeczy z naglowkow do wywalenia
-Hyperplane lead_through(const vector<Pattern>& patterns);
 
-vector<Pattern> get_nearest_with_different_label(const Pattern& pattern, uint32_t how_many, Dataset& dataset);
 vector<Pattern> get_all_with_same_side_and_label(const Pattern& p, const Hyperplane& h, Dataset& dataset);
 Pattern get_nearest(vector<Pattern>& patterns, const Hyperplane& h);
 
+vector<Pattern> get_nearest_with_different_label(const Pattern& pattern, uint32_t how_many, Dataset& dataset);
+
+Hyperplane lead_through(const vector<Pattern>& patterns);
 #endif //PERCEPTRON_PERCEPTRON_H

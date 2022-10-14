@@ -2,7 +2,8 @@
 
 Pattern::Pattern(const Image&  image, label l):
 image(image),
-l(l)
+l(l),
+h({}, 0)
 {}
 
 bool Pattern::operator==(const Pattern& that) const {

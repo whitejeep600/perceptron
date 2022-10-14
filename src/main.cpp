@@ -1,9 +1,14 @@
 #include <cassert>
 #include <algorithm>
+#include <iostream>
 #include "perceptron.h"
 #include "test.h"
+#include "utils.h"
 
 int main() {
-    test_get_with_same_side_and_label_and_get_nearest_and_moving_hyperplane();
+    increase_stack_size();
+    auto train_dataset = read_train_dataset();
+    label l = 0;
+    auto perceptrons = create_to_recognize(l, train_dataset);
     return 0;
 }
