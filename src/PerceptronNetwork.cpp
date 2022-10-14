@@ -1,16 +1,14 @@
 #include <iostream>
 #include <utility>
 #include <memory>
+#include <algorithm>
 #include "perceptron.h"
 #include "hyperplane.h"
-#include "../eigen/Eigen/Dense"
 #include "utils.h"
 // I ended up using this library for matrix inversions.
 // Surprisingly no more 'normal' library is available
 
 using namespace std;
-
-
 
 vector<Pattern> get_all_with_same_side_and_label(const Pattern& target, const Hyperplane& h, Dataset& dataset){
     vector<Pattern> result;
@@ -52,10 +50,10 @@ vector<Perceptron> create_to_recognize(label l, Dataset dataset){
     while(dataset.contains_label(l)){
         for(const auto& pattern: dataset.patterns){
             if(pattern.l == l){
-                same_side_and_label = get_all_with_same_side_and_label(pattern, pattern.h, dataset);
+                same_side_and_label = get_all_with_same_side_and_label(pattern, *(pattern.h), dataset);
                 if(same_side_and_label.size() > biggest_same_side_and_label.size()){
                     biggest_same_side_and_label = same_side_and_label;
-                    associated_with_biggest = pattern.h;
+                    associated_with_biggest = *(pattern.h);
                 }
             }
         }

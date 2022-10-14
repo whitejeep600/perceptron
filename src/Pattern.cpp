@@ -3,7 +3,7 @@
 Pattern::Pattern(const Image&  image, label l):
 image(image),
 l(l),
-h({}, 0)
+h(nullptr)
 {}
 
 bool Pattern::operator==(const Pattern& that) const {

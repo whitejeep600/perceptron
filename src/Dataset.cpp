@@ -1,5 +1,6 @@
 #include <cassert>
 #include <algorithm>
+#include <fstream>
 #include "perceptron.h"
 #include "utils.h"
 
@@ -72,29 +73,39 @@ vector<Pattern> get_nearest_with_different_label(const Pattern& pattern, uint32_
 // assemble these vectors into matrix A so that each vector becomes a row, c satisfies
 // Ax = 1 (vector of ones). Then x = A^{-1} * 1.
 Hyperplane lead_through(const vector<Pattern>& patterns){
-    auto A = std::make_unique<Eigen::Matrix<double, IMAGE_SIZE, IMAGE_SIZE>>();
+    //matrix A = {{0}}; todo zamienic z powrotem po przetestowaniu
+    auto A = std::vector<std::vector<double>>();
     uint32_t row = 0;
     assert(patterns.size() == IMAGE_SIZE);
     for(const auto& p: patterns){
         for(uint32_t column = 0; column < IMAGE_SIZE; ++column){
-            (*A)(row, column) = p.image.pixels[column];
+            A[row][column] = p.image.pixels[column];
         }
         ++row;
     }
-    auto A_inverted = std::make_unique<Eigen::Matrix<double, IMAGE_SIZE, IMAGE_SIZE>>((*A).inverse());
-    vector<double> coefficients_vector = sum_by_row(std::move(A_inverted));
+    //auto A_inverted = invert_matrix(A);
+    //vector<double> coefficients_vector = sum_by_row(A_inverted, IMAGE_SIZE);
+    vector<double> coefficients_vector = sum_by_row(A, IMAGE_SIZE);
     return {coefficients_vector, 1};
 }
 
 // actually we could dump to file
+// raz dumpujemy i nie zachowujemy kodu do dumpowania; potem preprocess uruchamiane jest z argumentem
+// bool from_preprocessed który informuje czy wczytać z dumpa czy stworzyć na nowo
 void Dataset::preprocess(label l) {
     // This can be done only once for each pattern while training to recognize a single label.
+    uint32_t i = 0;
+    std::ofstream dump_file("train_hyperplanes_dump.txt");
     for(Pattern& p: patterns){
         if(p.l == l) {
             vector<Pattern> nearest_different_label = get_nearest_with_different_label(p, 784, *this);
-            p.h = lead_through(nearest_different_label);
+            p.h = make_shared<Hyperplane>(lead_through(nearest_different_label));
+            dump_file << "sample number " << i << " constant " << (*(p.h)).constant_term << " vector: ";
+            for (const double c : (*(p.h)).coefficients_vector) dump_file << c << " ";
         }
+        ++i;
     }
+    dump_file.close();
 }
 
 

@@ -4,14 +4,18 @@
 #include <cstdint>
 #include <vector>
 #include <set>
+#include <memory>
 #include "hyperplane.h"
 
 using namespace std;
 using label = uint8_t;
 
+
 const uint32_t IMAGE_HEIGHT = 28; // todo
 const uint32_t IMAGE_WIDTH = 28;
 const uint32_t IMAGE_SIZE =  IMAGE_HEIGHT * IMAGE_WIDTH;
+
+using matrix = double[IMAGE_SIZE][IMAGE_SIZE];
 
 class Image{
 public:
@@ -26,7 +30,7 @@ class Pattern{
 public:
     Image image;
     label l;
-    Hyperplane h;
+    std::shared_ptr<Hyperplane> h;
     explicit Pattern(const Image& image, label l);
     bool operator==(const Pattern& that) const;
 };

@@ -27,20 +27,39 @@ vector<double> mul_vector_by_scalar(vector<double> vec, double scalar){
     return vec;
 }
 
-vector<double> sum_by_row(std::unique_ptr<Eigen::Matrix<double, IMAGE_SIZE, IMAGE_SIZE>> A) {
+vector<double> sum_by_row(std::vector<std::vector<double>>& A, uint32_t n) {
     auto result = vector<double>();
-    for(uint32_t i = 0; i < IMAGE_SIZE; ++i){
+    for(uint32_t i = 0; i < n; ++i){ // todo image_size?
         result.push_back(0);
-        for(uint32_t j = 0; j < IMAGE_SIZE; ++j){
-            result[i] += (*A)(i, j);
+        for(uint32_t j = 0; j < n; ++j){
+            result[i] += A[i][j];
         }
     }
     return result;
 }
 
-void increase_stack_size(){
-    const rlim_t stack_size = 67108864; // 64 MiB
-    struct rlimit rlim;
-    rlim.rlim_cur = stack_size;
-    setrlimit(RLIMIT_STACK, &rlim);
+double invert_matrix(std::vector<std::vector<double>>& vect) {
+    double pivot, det=1.0;
+    uint32_t i, j, p;
+    uint32_t size = vect[0].size();
+    std::vector<std::vector<double>> copy;
+    for(p=1; p <= size; p++)
+    {
+        pivot = vect[p-1][p-1];
+        det= det * pivot;
+        if (fabs(pivot) < 1e-5) return 0;
+        for (j = 1; j<= size; j++)
+            if (j != p) vect[p-1][j-1] =  vect[p-1][j-1] / pivot;
+        for (i = 1; i<= size; i++)
+            if (i != p) vect[i-1][p-1] = (-1.0) * vect[i-1][p-1] / pivot;
+        for (i = 1; i<= size; i++)
+            if (i != p)
+                for (j= 1; j <= size; j++)
+                    if (j != p)
+                        vect[i-1][j-1] = vect[i-1][j-1] + vect[p-1][j-1] * vect[i-1][p-1] * pivot;
+        vect[p-1][p-1] = 1/ pivot;
+    }
+    return det;
+
 }
+

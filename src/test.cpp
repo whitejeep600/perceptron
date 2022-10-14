@@ -1,5 +1,6 @@
 #include <cassert>
 #include <algorithm>
+#include <cmath>
 #include "perceptron.h"
 #include "utils.h"
 
@@ -150,4 +151,26 @@ void test_get_with_same_side_and_label_and_get_nearest_and_moving_hyperplane(){
     h.move_halfway_to_point(vector<double>{0, 0, 4.5});
     assert(h.coefficients_vector == expected_coefficients);
     assert(h.constant_term == 4);
+}
+
+bool almost_equal(double a, double b){
+    if(abs((a-b)) < 0.1 * fabs(a))
+        return true;
+    else
+        return false;
+}
+
+void test_invert_matrix(){
+    auto A = std::vector<std::vector<double>>{{2, 1, 3},
+                      {1, 3,  -3},
+                      {-2, 4, 4}};
+    auto expected_inverted = std::vector<std::vector<double>>{{0.3, 0.1, -0.15},
+                                      {0.025, 0.175, 9.0/80},
+                                      {0.125, -0.125, 0.0625}};
+    double res = invert_matrix(A);
+    assert(res != 0);
+    for(int i = 0; i < 3; ++i){
+        for(int j = 0; j < 3; ++j)
+            assert(almost_equal(expected_inverted[i][j], A[i][j]));
+    }
 }

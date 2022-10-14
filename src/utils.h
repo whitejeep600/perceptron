@@ -5,7 +5,6 @@
 #include <cstdint>
 #include <memory>
 #include <sys/resource.h>
-#include "../eigen/Eigen/Dense"
 #include "perceptron.h"
 
 using namespace std;
@@ -21,8 +20,8 @@ double euclidean_norm(const vector<double>& vec);
 
 vector<double> mul_vector_by_scalar(vector<double> vec, double scalar);
 
-vector<double> sum_by_row(std::unique_ptr<Eigen::Matrix<double, IMAGE_SIZE, IMAGE_SIZE>> A);
+vector<double> sum_by_row(std::vector<std::vector<double>>& A, uint32_t n) ;
 
-void increase_stack_size();
+double invert_matrix(std::vector<std::vector<double>>& vect);
 
 #endif //PERCEPTRON_UTILS_H
