@@ -74,17 +74,17 @@ vector<Pattern> get_nearest_with_different_label(const Pattern& pattern, uint32_
 // Ax = 1 (vector of ones). Then x = A^{-1} * 1.
 Hyperplane lead_through(const vector<Pattern>& patterns){
     //matrix A = {{0}}; todo zamienic z powrotem po przetestowaniu
-    auto A = std::vector<std::vector<double>>();
+    auto A = std::vector<std::vector<double>>(IMAGE_SIZE);
     uint32_t row = 0;
     assert(patterns.size() == IMAGE_SIZE);
     for(const auto& p: patterns){
+        A[row] = std::vector<double>(IMAGE_SIZE);
         for(uint32_t column = 0; column < IMAGE_SIZE; ++column){
             A[row][column] = p.image.pixels[column];
         }
         ++row;
     }
-    //auto A_inverted = invert_matrix(A);
-    //vector<double> coefficients_vector = sum_by_row(A_inverted, IMAGE_SIZE);
+    invert_matrix(A);
     vector<double> coefficients_vector = sum_by_row(A, IMAGE_SIZE);
     return {coefficients_vector, 1};
 }
@@ -93,7 +93,7 @@ Hyperplane lead_through(const vector<Pattern>& patterns){
 // raz dumpujemy i nie zachowujemy kodu do dumpowania; potem preprocess uruchamiane jest z argumentem
 // bool from_preprocessed który informuje czy wczytać z dumpa czy stworzyć na nowo
 void Dataset::preprocess(label l) {
-    // This can be done only once for each pattern while training to recognize a single label.
+    // This only needs to be done once for each pattern while training to recognize a single label.
     uint32_t i = 0;
     std::ofstream dump_file("train_hyperplanes_dump.txt");
     for(Pattern& p: patterns){
@@ -102,6 +102,7 @@ void Dataset::preprocess(label l) {
             p.h = make_shared<Hyperplane>(lead_through(nearest_different_label));
             dump_file << "sample number " << i << " constant " << (*(p.h)).constant_term << " vector: ";
             for (const double c : (*(p.h)).coefficients_vector) dump_file << c << " ";
+            dump_file << "\n";
         }
         ++i;
     }

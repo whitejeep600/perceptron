@@ -154,7 +154,7 @@ void test_get_with_same_side_and_label_and_get_nearest_and_moving_hyperplane(){
 }
 
 bool almost_equal(double a, double b){
-    if(abs((a-b)) < 0.1 * fabs(a))
+    if(abs((a-b)) <= 0.1 * fabs(a))
         return true;
     else
         return false;
@@ -164,13 +164,24 @@ void test_invert_matrix(){
     auto A = std::vector<std::vector<double>>{{2, 1, 3},
                       {1, 3,  -3},
                       {-2, 4, 4}};
-    auto expected_inverted = std::vector<std::vector<double>>{{0.3, 0.1, -0.15},
-                                      {0.025, 0.175, 9.0/80},
-                                      {0.125, -0.125, 0.0625}};
+    auto expected_inverted_A = std::vector<std::vector<double>>{{0.3,   0.1,    -0.15},
+                                                                {0.025, 0.175, 9.0/80},
+                                                                {0.125, -0.125, 0.0625}};
     double res = invert_matrix(A);
     assert(res != 0);
     for(int i = 0; i < 3; ++i){
         for(int j = 0; j < 3; ++j)
-            assert(almost_equal(expected_inverted[i][j], A[i][j]));
+            assert(almost_equal(expected_inverted_A[i][j], A[i][j]));
+    }
+    auto B= std::vector<std::vector<double>>{{1, 2, -1},
+                                              {2, 1,  2},
+                                              {-1, 2, 1}};
+    auto expected_inverted_B = std::vector<std::vector<double>>{{3.0/16,   0.25,    -5.0/16},
+                                                                {0.25, 0, 0.25},
+                                                                {-5.0/16, 0.25, 3.0/16}};
+    res = invert_matrix(B);
+    for(int i = 0; i < 3; ++i){
+        for(int j = 0; j < 3; ++j)
+            assert(almost_equal(expected_inverted_B[i][j], B[i][j]));
     }
 }
