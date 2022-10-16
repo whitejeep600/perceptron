@@ -13,12 +13,12 @@
 // wykonywane są pewne obliczenia raz dla każdego patternu i mają łatwy do zdumpowania wynik.
 // pakistański paper XDDDDDDD
 int main() {
-    const rlim_t stack_size = 67108864; // 64 MiB
+    const rlim_t stack_size = 134217728; // 128 MiB
     struct rlimit rlim;
     rlim.rlim_cur = stack_size;
     setrlimit(RLIMIT_STACK, &rlim);
     auto train_dataset = read_train_dataset();
     label l = 0;
-    auto perceptrons = create_to_recognize(l, train_dataset);
+    auto perceptrons = create_to_recognize(l, train_dataset, true);
     return 0;
 }

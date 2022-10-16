@@ -1,6 +1,7 @@
 #include <cassert>
 #include <algorithm>
 #include <fstream>
+#include <iostream>
 #include "perceptron.h"
 #include "utils.h"
 
@@ -41,7 +42,7 @@ void Dataset::remove_patterns(const vector<Pattern>& to_remove){
     }
 }
 
-vector<Pattern> get_nearest_with_different_label(const Pattern& pattern, uint32_t how_many, Dataset& dataset){
+vector<Pattern> get_nearest_with_different_label(const Pattern& pattern, uint32_t how_many, Dataset dataset){
     struct key
     {
         Pattern target_pattern;
@@ -92,21 +93,63 @@ Hyperplane lead_through(const vector<Pattern>& patterns){
 // actually we could dump to file
 // raz dumpujemy i nie zachowujemy kodu do dumpowania; potem preprocess uruchamiane jest z argumentem
 // bool from_preprocessed który informuje czy wczytać z dumpa czy stworzyć na nowo
-void Dataset::preprocess(label l) {
+
+void Dataset::preprocess(label l, bool dump) {
     // This only needs to be done once for each pattern while training to recognize a single label.
+    // Also it begs for parallelizing, computation for each pattern is independent
     uint32_t i = 0;
-    std::ofstream dump_file("train_hyperplanes_dump.txt");
+    std::ofstream dump_file;
+    if(dump){
+        dump_file = std::ofstream("train_hyperplanes_dump.txt");
+    }
     for(Pattern& p: patterns){
         if(p.l == l) {
             vector<Pattern> nearest_different_label = get_nearest_with_different_label(p, 784, *this);
             p.h = make_shared<Hyperplane>(lead_through(nearest_different_label));
-            dump_file << "sample number " << i << " constant " << (*(p.h)).constant_term << " vector: ";
-            for (const double c : (*(p.h)).coefficients_vector) dump_file << c << " ";
-            dump_file << "\n";
+            if(dump){
+                dump_file << "sample number " << i << " constant " << (*(p.h)).constant_term << " vector: ";
+                for (const double c : (*(p.h)).coefficients_vector) dump_file << c << " ";
+                dump_file << "\n";
+            }
         }
         ++i;
     }
+    if(dump){
+        dump_file.close();
+    }
+}
+
+void Dataset::preprocess_from_dump(label l) {
+    uint32_t i = 0;
+    auto dump_file = std::ifstream("../data/train_hyperplanes_dump.txt");
+    string input_token;
+    double constant_term;
+    vector<double> coefficients;
+    for(Pattern& p: patterns){
+        if(p.l == l) {
+            dump_file >> input_token;
+            assert(input_token == "sample");
+            dump_file >> input_token;
+            assert(input_token == "number");
+            dump_file >> input_token;
+            assert(i == stoul(input_token));
+            dump_file >> input_token;
+            assert(input_token == "constant");
+            dump_file >> input_token;
+            constant_term = std::stod(input_token) ;
+            dump_file >> input_token;
+            assert(input_token == "vector:");
+            for(uint32_t j = 0; j < IMAGE_SIZE; ++j){
+                dump_file >> input_token;
+                coefficients.push_back(std::stod(input_token));
+            }
+            p.h = make_shared<Hyperplane>(Hyperplane(coefficients, constant_term));
+        }
+        ++i;
+    }
+    // assert(!(dump_file >> constant_term)); // making sure everything was read from the file todo
     dump_file.close();
+    cout << "read all";
 }
 
 

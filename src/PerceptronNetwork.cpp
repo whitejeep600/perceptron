@@ -20,7 +20,7 @@ vector<Pattern> get_all_with_same_side_and_label(const Pattern& target, const Hy
     }
     return result;
 }
-//
+
 Pattern get_nearest(vector<Pattern>& patterns, const Hyperplane& h){
     struct key
     {
@@ -39,11 +39,17 @@ Pattern get_nearest(vector<Pattern>& patterns, const Hyperplane& h){
 
 // Create a vector of perceptrons to recognize label l based on the dataset. If any of the
 // resulting perceptrons light up for a pattern, it will be assigned the label l.
-vector<Perceptron> create_to_recognize(label l, Dataset dataset){
+vector<Perceptron> create_to_recognize(label l, Dataset dataset, bool training){
     // passing dataset by value because it's convenient to remove stuff from it while learning,
     // but we don't want this to affect the original dataset
     vector<Perceptron> result;
-    dataset.preprocess(l);
+    if(training){
+        dataset.preprocess_from_dump(l);
+        // change this to dataset.preprocess(l, true) to dump the preprocessing results to file
+    }
+    else{
+        dataset.preprocess(l, false);
+    }
     vector<Pattern> same_side_and_label;
     vector<Pattern> biggest_same_side_and_label;
     Hyperplane associated_with_biggest;
