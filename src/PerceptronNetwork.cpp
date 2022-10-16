@@ -107,9 +107,9 @@ void PerceptronNetwork::test_on_dataset(const Dataset& dataset, label l) {
     double precision = ((double) true_positives) / (true_positives + false_positives);
     double recall = ((double) true_positives) / (true_positives + false_negatives);
     double F1 = ((double) 2.0) * precision * recall / (precision + recall);
-    cout << "dataset size: " << all << "\n.";
+    cout << "dataset size: " << all << ".\n";
     cout << "true positives: " << true_positives << ", false positives: " << false_positives;
-    cout << ", true negatives: " << true_negatives << ", false negatives: " << false_negatives << "\n";
-    cout << "precision: " << precision << ", recall: " << recall << "\n.";
-    cout << "F1 score: " << F1 << "\n.";
+    cout << ", true negatives: " << true_negatives << ", false negatives: " << false_negatives << ".\n";
+    cout << "precision: " << precision << ", recall: " << recall << ".\n";
+    cout << "F1 score: " << F1 << ".\n";
 }

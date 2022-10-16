@@ -10,7 +10,7 @@
 // do raportu: rozkmina z przeprowadzaniem hiperpłaszczyzny, z przesunięciem o wektor, eigen i problem
 // z pamięcią, problem z czasem wykonania i dumpowanie do pliku - fajnie że jest w ogóle możliwe bo
 // wykonywane są pewne obliczenia raz dla każdego patternu i mają łatwy do zdumpowania wynik.
-// pakistański paper XDDDDDDD
+// paper XD
 // no może taki workaround że wczytujem te hiperpłaszczyzny dla patternu na żądanie
 int main() {
     const rlim_t stack_size = 134217728; // 128 MiB

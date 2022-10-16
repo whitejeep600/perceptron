@@ -32,7 +32,7 @@ patterns(patterns)
 // I know this is ugly but using a hashset or something in cpp is pain :)
 void Dataset::remove_patterns(const vector<Pattern>& to_remove){
     uint32_t temp_size = 0;
-    for(auto target: to_remove){
+    for(auto& target: to_remove){
         auto iter = find(patterns.begin(), patterns.end(), target);
         if(iter != patterns.end()){
             temp_size = patterns.size();
@@ -150,7 +150,6 @@ void Dataset::preprocess_from_dump(label l) {
     }
     // assert(!(dump_file >> constant_term)); // making sure everything was read from the file todo
     dump_file.close();
-    cout << "read all";
 }
 
 
