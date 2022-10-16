@@ -20,8 +20,8 @@ double euclidean_norm(const vector<double>& vec);
 
 vector<double> mul_vector_by_scalar(vector<double> vec, double scalar);
 
-vector<double> sum_by_row(std::vector<std::vector<double>>& A, uint32_t n) ;
+vector<double> sum_by_row(Matrix& A, uint32_t n) ;
 
-double invert_matrix(std::vector<std::vector<double>>& vect);
+Matrix invert_matrix(const Matrix& matrix);
 
 #endif //PERCEPTRON_UTILS_H

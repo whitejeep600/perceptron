@@ -10,7 +10,7 @@
 
 using namespace std;
 using label = uint8_t;
-
+using Matrix = std::vector<std::vector<double>>;
 
 const uint32_t IMAGE_HEIGHT = 28; // todo
 const uint32_t IMAGE_WIDTH = 28;
@@ -69,8 +69,7 @@ public:
 Dataset read_train_dataset();
 Dataset read_test_dataset();
 
-// todo znaczy ten bool training jest chyba niepotrzebny? xd bo przeciez zawsze sie tworzy podczas treningu
-PerceptronNetwork create_to_recognize(label l, Dataset dataset, bool training);
+PerceptronNetwork create_to_recognize(label l, Dataset dataset, bool from_preprocessed);
 
 // todo niepotrzebne rzeczy z naglowkow do wywalenia
 

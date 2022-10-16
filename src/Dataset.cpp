@@ -71,11 +71,10 @@ vector<Pattern> get_nearest_with_different_label(const Pattern& pattern, uint32_
 // Let the plane equation in n dimensions be sum(c_n * x_n = 1) (this is assuming that
 // zero does not belong to the plane but that is extremely unlikely to happen). Then let c
 // be the vector of c_i. We are given a set of vectors belonging to that plane. If we
-// assemble these vectors into matrix A so that each vector becomes a row, c satisfies
+// assemble these vectors into Matrix A so that each vector becomes a row, c satisfies
 // Ax = 1 (vector of ones). Then x = A^{-1} * 1.
 Hyperplane lead_through(const vector<Pattern>& patterns){
-    //matrix A = {{0}}; todo zamienic z powrotem po przetestowaniu
-    auto A = std::vector<std::vector<double>>(IMAGE_SIZE);
+    auto A = Matrix (IMAGE_SIZE);
     uint32_t row = 0;
     assert(patterns.size() == IMAGE_SIZE);
     for(const auto& p: patterns){
@@ -85,14 +84,10 @@ Hyperplane lead_through(const vector<Pattern>& patterns){
         }
         ++row;
     }
-    invert_matrix(A);
-    vector<double> coefficients_vector = sum_by_row(A, IMAGE_SIZE);
+    auto inverse = invert_matrix(A);
+    vector<double> coefficients_vector = sum_by_row(inverse, IMAGE_SIZE);
     return {coefficients_vector, 1};
 }
-
-// actually we could dump to file
-// raz dumpujemy i nie zachowujemy kodu do dumpowania; potem preprocess uruchamiane jest z argumentem
-// bool from_preprocessed który informuje czy wczytać z dumpa czy stworzyć na nowo
 
 void Dataset::preprocess(label l, bool dump) {
     // This only needs to be done once for each pattern while training to recognize a single label.
@@ -100,7 +95,7 @@ void Dataset::preprocess(label l, bool dump) {
     uint32_t i = 0;
     std::ofstream dump_file;
     if(dump){
-        dump_file = std::ofstream("train_hyperplanes_dump.txt");
+        dump_file = std::ofstream("../data/train_hyperplanes_dump.txt");
     }
     for(Pattern& p: patterns){
         if(p.l == l) {
@@ -110,6 +105,7 @@ void Dataset::preprocess(label l, bool dump) {
                 dump_file << "sample number " << i << " constant " << (*(p.h)).constant_term << " vector: ";
                 for (const double c : (*(p.h)).coefficients_vector) dump_file << c << " ";
                 dump_file << "\n";
+                cout << i << "\n";
             }
         }
         ++i;

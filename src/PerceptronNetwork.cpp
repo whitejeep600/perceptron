@@ -5,14 +5,14 @@
 #include "perceptron.h"
 #include "hyperplane.h"
 #include "utils.h"
-// I ended up using this library for matrix inversions.
+// I ended up using this library for Matrix inversions.
 // Surprisingly no more 'normal' library is available
 
 using namespace std;
 
 vector<Pattern> get_all_with_same_side_and_label(const Pattern& target, const Hyperplane& h, Dataset& dataset){
     vector<Pattern> result;
-    for(Pattern p: dataset.patterns){
+    for(Pattern& p: dataset.patterns){
         if(p.l == target.l and h.on_same_side(target.image.to_algebraic_vector(),
                                               p.image.to_algebraic_vector())){
             result.push_back(p);
@@ -39,11 +39,11 @@ Pattern get_nearest(vector<Pattern>& patterns, const Hyperplane& h){
 
 // Create a vector of perceptrons to recognize label l based on the dataset. If any of the
 // resulting perceptrons light up for a pattern, it will be assigned the label l.
-PerceptronNetwork create_to_recognize(label l, Dataset dataset, bool training){
+PerceptronNetwork create_to_recognize(label l, Dataset dataset, bool from_preprocessed){
     // passing dataset by value because it's convenient to remove stuff from it while learning,
     // but we don't want this to affect the original dataset
     vector<Perceptron> result;
-    if(training){
+    if(from_preprocessed){
         dataset.preprocess_from_dump(l);
         // change this to dataset.preprocess(l, true) to dump the preprocessing results to file
     }
@@ -68,6 +68,7 @@ PerceptronNetwork create_to_recognize(label l, Dataset dataset, bool training){
         result.emplace_back(associated_with_biggest,
                             associated_with_biggest.on_positive_side(nearest.image.to_algebraic_vector()));
         dataset.remove_patterns(biggest_same_side_and_label);
+        cout << "removing " << biggest_same_side_and_label.size() << "patterns\n" ;
         biggest_same_side_and_label.clear();
     }
     return PerceptronNetwork{result};
