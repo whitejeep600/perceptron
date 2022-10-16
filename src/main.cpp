@@ -7,11 +7,11 @@
 
 // todo przepisać na nieużywanie eigen, pamiętając o alokacjach na stercie i delete na wszelki wypadek;
 // może jednak jeszcze jeden test xd
-// zdumpować do pliku; i napisać wczytywanie z pliku
 // do raportu: rozkmina z przeprowadzaniem hiperpłaszczyzny, z przesunięciem o wektor, eigen i problem
 // z pamięcią, problem z czasem wykonania i dumpowanie do pliku - fajnie że jest w ogóle możliwe bo
 // wykonywane są pewne obliczenia raz dla każdego patternu i mają łatwy do zdumpowania wynik.
 // pakistański paper XDDDDDDD
+// no może taki workaround że wczytujem te hiperpłaszczyzny dla patternu na żądanie
 int main() {
     const rlim_t stack_size = 134217728; // 128 MiB
     struct rlimit rlim;

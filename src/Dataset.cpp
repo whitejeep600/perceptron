@@ -126,6 +126,7 @@ void Dataset::preprocess_from_dump(label l) {
     double constant_term;
     vector<double> coefficients;
     for(Pattern& p: patterns){
+        coefficients.clear();
         if(p.l == l) {
             dump_file >> input_token;
             assert(input_token == "sample");
