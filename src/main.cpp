@@ -19,6 +19,7 @@ int main() {
     setrlimit(RLIMIT_STACK, &rlim);
     auto train_dataset = read_train_dataset();
     label l = 0;
-    auto perceptrons = create_to_recognize(l, train_dataset, true);
+    auto network = create_to_recognize(l, train_dataset, true);
+    network.test_on_dataset(read_test_dataset(), l);
     return 0;
 }

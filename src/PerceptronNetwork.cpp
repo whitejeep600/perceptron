@@ -39,7 +39,7 @@ Pattern get_nearest(vector<Pattern>& patterns, const Hyperplane& h){
 
 // Create a vector of perceptrons to recognize label l based on the dataset. If any of the
 // resulting perceptrons light up for a pattern, it will be assigned the label l.
-vector<Perceptron> create_to_recognize(label l, Dataset dataset, bool training){
+PerceptronNetwork create_to_recognize(label l, Dataset dataset, bool training){
     // passing dataset by value because it's convenient to remove stuff from it while learning,
     // but we don't want this to affect the original dataset
     vector<Perceptron> result;
@@ -68,6 +68,48 @@ vector<Perceptron> create_to_recognize(label l, Dataset dataset, bool training){
         result.emplace_back(associated_with_biggest,
                             associated_with_biggest.on_positive_side(nearest.image.to_algebraic_vector()));
         dataset.remove_patterns(biggest_same_side_and_label);
+        biggest_same_side_and_label.clear();
     }
-    return result;
+    return PerceptronNetwork{result};
+}
+
+bool PerceptronNetwork::recognizes(const Pattern &pattern) {
+    for(auto& perceptron: perceptrons){
+        if(perceptron.recognizes(pattern)) return true;
+    }
+    return false;
+}
+
+void PerceptronNetwork::test_on_dataset(const Dataset& dataset, label l) {
+    uint32_t all = dataset.patterns.size();
+    uint32_t true_positives = 0;
+    uint32_t false_positives = 0;
+    uint32_t true_negatives = 0;
+    uint32_t false_negatives = 0;
+    for(auto& pattern: dataset.patterns){
+        if(pattern.l == l){
+            if(this->recognizes(pattern)){
+                ++true_positives;
+            }
+            else{
+                ++false_negatives;
+            }
+        }
+        else{
+            if(this->recognizes(pattern)){
+                ++false_positives;
+            }
+            else{
+                ++true_negatives;
+            }
+        }
+    }
+    double precision = ((double) true_positives) / (true_positives + false_positives);
+    double recall = ((double) true_positives) / (true_positives + false_negatives);
+    double F1 = ((double) 2.0) * precision * recall / (precision + recall);
+    cout << "dataset size: " << all << "\n.";
+    cout << "true positives: " << true_positives << ", false positives: " << false_positives;
+    cout << ", true negatives: " << true_negatives << ", false negatives: " << false_negatives << "\n";
+    cout << "precision: " << precision << ", recall: " << recall << "\n.";
+    cout << "F1 score: " << F1 << "\n.";
 }
