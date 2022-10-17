@@ -1,5 +1,6 @@
 #include <valarray>
 #include <cassert>
+#include <random>
 #include "utils.h"
 #include "perceptron.h"
 
@@ -39,37 +40,55 @@ vector<double> sum_by_row(Matrix& A, uint32_t n) {
     return result;
 }
 
-// This function is based on the code from the paper: Farooq, A., &  Hamid, K. (2010).
-// An efficient and simple algorithm for matrix inversion.
-double get_determinant(Matrix matrix) {
-    double pivot, det=1.0;
-    uint32_t i, j, p;
-    uint32_t size = matrix[0].size();
-    std::vector<std::vector<double>> copy;
-    for(p=1; p <= size; p++)
-    {
-        pivot = matrix[p-1][p-1];
-        det= det * pivot;
-        if (fabs(pivot) < 1e-5) return 0;
-        for (j = 1; j<= size; j++)
-            if (j != p) matrix[p-1][j-1] =  matrix[p-1][j-1] / pivot;
-        for (i = 1; i<= size; i++)
-            if (i != p) matrix[i-1][p-1] = (-1.0) * matrix[i-1][p-1] / pivot;
-        for (i = 1; i<= size; i++)
-            if (i != p)
-                for (j= 1; j <= size; j++)
-                    if (j != p)
-                        matrix[i-1][j-1] = matrix[i-1][j-1] + matrix[p-1][j-1] * matrix[i-1][p-1] * pivot;
-        matrix[p-1][p-1] = 1/ pivot;
-    }
-    return det;
-}
 
-// DISCLAIMER : all the code below is heavily based on a solution I found on Stack Overflow.
+// DISCLAIMER : all the code below is heavily based on solutions I found on internet forums.
 // I hope this is okay for the purposes of the assignment and will not be seen as cheating.
 // It would surely have been allowed to use a C++ library function for Matrix inversion,
 // but sadly no such function is available, and I did not want to write my own code for
 // such a basic task.
+double get_determinant(Matrix matrix) {
+    uint32_t size = matrix.size();
+    double num1, num2, det = 1;
+    uint32_t index;
+    double total = 1;
+    double temp[size + 1];
+    for (uint32_t i = 0; i < size; i++)
+    {
+        index = i;
+         while (index < size && matrix[i][index] == 0){
+             index++;
+         }
+         if (index == size){
+             continue;
+             }
+         if (index != i){
+             for (uint32_t j = 0; j < size; j++){
+                 swap(matrix[index][j], matrix[i][j]);
+             }
+             det *= pow(-1, index - i);
+         }
+         for (uint32_t j = 0; j < size; j++){
+             temp[j] = matrix[i][j];
+         }
+         for (uint32_t j = i + 1; j < size; j++){
+             num1 = temp[i];
+             num2 = matrix[j][i];
+             for (uint32_t k = 0; k < size; k++){
+                 matrix[j][k] = (num1 * matrix[j][k]) - (num2 * temp[k]);
+             }
+             total *=  num1;
+         }
+    }
+    for (uint32_t i = 0; i < size; i++){
+        det *= matrix[i][i];
+    }
+    if(total == 0) return 0;
+    return (det / total);
+}
+
+bool invertible(const Matrix& matrix){
+    return get_determinant(matrix) != 0;
+}
 
 Matrix get_transpose(const Matrix& matrix) {
 
@@ -111,8 +130,9 @@ Matrix get_cofactor(const std::vector<std::vector<double>>& matrix) {
 }
 
 Matrix invert_matrix(const Matrix& matrix) {
-    assert(get_determinant(matrix) != 0);
-    double d = 1.0 / get_determinant(matrix);
+    double det = get_determinant(matrix);
+    assert(det != 0);
+    double d = 1.0 / det;
     Matrix solution(matrix.size(), std::vector<double> (matrix.size()));
 
     for(uint32_t i = 0; i < matrix.size(); i++) {

@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <fstream>
 #include <iostream>
+#include <random>
 #include "perceptron.h"
 #include "utils.h"
 
@@ -68,25 +69,83 @@ vector<Pattern> get_nearest_with_different_label(const Pattern& pattern, uint32_
     return result;
 }
 
-// Let the plane equation in n dimensions be sum(c_n * x_n = 1) (this is assuming that
-// zero does not belong to the plane but that is extremely unlikely to happen). Then let c
-// be the vector of c_i. We are given a set of vectors belonging to that plane. If we
-// assemble these vectors into Matrix A so that each vector becomes a row, c satisfies
-// Ax = 1 (vector of ones). Then x = A^{-1} * 1.
+// dobra chyba trzeba po prostu inaczej rozwiązać ren układ równań, tylko pamiętać o zaburzeniu macierzy.
+// nie wiem może jakieś przybliżenie iteracyjne
+// albo przepisać na pytonga i svd
+// albo po prostu dobrać jakieś arbitralne wartości tam gdzie jest niejednoznaczność
+// tworzenie hiperpłaszczyzny z svm?
+// a może np iteracyjnie? dopóki maciora jest osobliwa to dopisujemy do coefficients jedynkę i idziemy dalej
+// albo zero
+// nie no to się dobrze nie skończy bo ostatnia kolumna też raczej zawiera same zera
+// może jest jakiś algorytm żeby znaleźć JAKIEŚ rozwiązanie niejednoznacznego układu równań. bo on przecież
+// sprzeczny raczej nie jest
+// może znajdowanie kolumn z samymi zerami i jeśli kolumna p ma same zera, to można wywalić kolumnę
+// i wiersz p i wpisać jedynkę do coefficients vector? i znaleźć rozwiązanie dla reszty
+
+
+bool column_has_only_zeroes(const Matrix& matrix, uint32_t col){
+    for(uint32_t i = 0; i < matrix.size(); ++i){
+        if(matrix[i][col] != 0) return false;
+    }
+    return true;
+}
+
+vector<uint32_t> find_columns_of_zeroes(const Matrix& matrix){
+    vector<uint32_t> res;
+    for(uint32_t i = 0; i < matrix.size(); ++i){
+        if(column_has_only_zeroes(matrix, i)) res.push_back(i);
+    }
+    return res;
+}
+
+// todo mamy za zadanie znaleźć takie x, Mx = 1
+// no ale hola, nie
+// jeżeli któryś wiersz jest cały zerami to i tak się nie da tego zrobić,
+// więc jest jakoś jeszcze dziwniej
+// może na przypadki? jeśli jest kolumna z samymi zerami (albo macierz osobliwa?) to musi przechodzic
+// przez środek układu współrzędnych i wtedy constant_term jest 0? a jeśli nie to jest 1
+// no to zaraz ... jeżeli to ma przechodzić przez środek układu współrzędnych to jest równanie
+// Ax = 0 i można podstawić za iksa zero i już
+// może poprosić o konsultację z jiaoshou i już
+
+class Rand_double
+{
+public:
+    Rand_double(double low, double high)
+            :r(std::bind(std::uniform_real_distribution<>(low,high),std::default_random_engine())){}
+
+    double operator()(){ return r(); }
+
+private:
+    std::function<double()> r;
+};
+
 Hyperplane lead_through(const vector<Pattern>& patterns){
-    auto A = Matrix (IMAGE_SIZE);
+    auto matrix = Matrix (IMAGE_SIZE);
     uint32_t row = 0;
     assert(patterns.size() == IMAGE_SIZE);
     for(const auto& p: patterns){
-        A[row] = std::vector<double>(IMAGE_SIZE);
+        matrix[row] = std::vector<double>(IMAGE_SIZE);
         for(uint32_t column = 0; column < IMAGE_SIZE; ++column){
-            A[row][column] = p.image.pixels[column];
+            matrix[row][column] = p.image.pixels[column];
         }
         ++row;
     }
-    auto inverse = invert_matrix(A);
-    vector<double> coefficients_vector = sum_by_row(inverse, IMAGE_SIZE);
-    return {coefficients_vector, 1};
+    vector<double> res;
+    bool at_least_one_zero = false;
+    Rand_double rd{-1,1};
+    for(uint32_t i = 0; i < matrix.size(); ++i){
+        if(column_has_only_zeroes(matrix, i)){
+            res.push_back(rd());
+        }
+        else{
+            res.push_back(0.0);
+            at_least_one_zero = true;
+        }
+    }
+    assert(at_least_one_zero);
+    return {res, 0.0};
+
 }
 
 void Dataset::preprocess(label l, bool dump) {

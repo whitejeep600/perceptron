@@ -73,6 +73,8 @@ PerceptronNetwork create_to_recognize(label l, Dataset dataset, bool from_prepro
 
 // todo niepotrzebne rzeczy z naglowkow do wywalenia
 
+// todo w ogóle mnóstwo rzeczy jest w jakichś dziwnych nagłówkach np lead_through w dataset
+
 vector<Pattern> get_all_with_same_side_and_label(const Pattern& p, const Hyperplane& h, Dataset& dataset);
 Pattern get_nearest(vector<Pattern>& patterns, const Hyperplane& h);
 

@@ -24,4 +24,5 @@ vector<double> sum_by_row(Matrix& A, uint32_t n) ;
 
 Matrix invert_matrix(const Matrix& matrix);
 
+
 #endif //PERCEPTRON_UTILS_H

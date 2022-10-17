@@ -48,7 +48,8 @@ PerceptronNetwork create_to_recognize(label l, Dataset dataset, bool from_prepro
         // change this to dataset.preprocess(l, true) to dump the preprocessing results to file
     }
     else{
-        dataset.preprocess(l, false);
+        //dataset.preprocess(l, false);
+        dataset.preprocess(l, true);
     }
     vector<Pattern> same_side_and_label;
     vector<Pattern> biggest_same_side_and_label;
