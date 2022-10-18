@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <fstream>
 #include <iostream>
+#include <functional>
 #include <random>
 #include "perceptron.h"
 #include "utils.h"

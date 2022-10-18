@@ -21,6 +21,19 @@ vector<Pattern> get_all_with_same_side_and_label(const Pattern& target, const Hy
     return result;
 }
 
+vector<Pattern> get_all_with_same_side_and_different_label(const Pattern& target,
+                                                           const Hyperplane& h,
+                                                           Dataset& dataset){
+    vector<Pattern> result;
+    for(Pattern& p: dataset.patterns){
+        if(p.l != target.l and h.on_same_side(target.image.to_algebraic_vector(),
+                                              p.image.to_algebraic_vector())){
+            result.push_back(p);
+        }
+    }
+    return result;
+}
+
 Pattern get_nearest(vector<Pattern>& patterns, const Hyperplane& h){
     struct key
     {
@@ -52,25 +65,40 @@ PerceptronNetwork create_to_recognize(label l, Dataset dataset, bool from_prepro
         dataset.preprocess(l, true);
     }
     vector<Pattern> same_side_and_label;
-    vector<Pattern> biggest_same_side_and_label;
-    Hyperplane associated_with_biggest;
+    vector<Pattern> same_side_and_different_label;
+    Hyperplane best_hyperplane;
+    vector<Pattern> selected_by_best_hyperplane;
+    double precision;
+    double best_precision;
     while(dataset.contains_label(l)){
+        best_precision = 0;
         for(const auto& pattern: dataset.patterns){
             if(pattern.l == l){
                 same_side_and_label = get_all_with_same_side_and_label(pattern, *(pattern.h), dataset);
-                if(same_side_and_label.size() > biggest_same_side_and_label.size()){
-                    biggest_same_side_and_label = same_side_and_label;
-                    associated_with_biggest = *(pattern.h);
+                same_side_and_different_label =
+                        get_all_with_same_side_and_different_label(pattern, *(pattern.h), dataset);
+                // mozna tu zostaic greedy approach i zamienic kryterium - np precyzje priorytetyzowac
+                // z jednej strony powinna byc priorytetyzowana precyzja. z drugiej strony jesli sie przesadzi,
+                // to bedziemy moze wybierac neurony precyzyjnie rozpoznajace po parę labeli, i skończymy
+                // z masą precycyjnych nerłonów, które razem będą jednak mało precyzyjne...
+                cout << "selecting neuron with tp " << same_side_and_label.size()
+                     << ", fp " << same_side_and_different_label.size();
+                precision = ((double) same_side_and_label.size()) /
+                        ((double) same_side_and_label.size() + (double) same_side_and_different_label.size());
+                if(precision > best_precision){ // todo if cos innego
+                    selected_by_best_hyperplane = same_side_and_label;
+                    best_hyperplane = *(pattern.h);
+                    best_precision = precision;
                 }
             }
         }
-        Pattern nearest = get_nearest(biggest_same_side_and_label, associated_with_biggest);
-        associated_with_biggest.move_halfway_to_point(nearest.image.to_algebraic_vector());
-        result.emplace_back(associated_with_biggest,
-                            associated_with_biggest.on_positive_side(nearest.image.to_algebraic_vector()));
-        dataset.remove_patterns(biggest_same_side_and_label);
-        cout << "removing " << biggest_same_side_and_label.size() << "patterns\n" ;
-        biggest_same_side_and_label.clear();
+        Pattern nearest = get_nearest(selected_by_best_hyperplane, best_hyperplane);
+        best_hyperplane.move_halfway_to_point(nearest.image.to_algebraic_vector());
+        result.emplace_back(best_hyperplane,
+                            best_hyperplane.on_positive_side(nearest.image.to_algebraic_vector()));
+        dataset.remove_patterns(selected_by_best_hyperplane);
+        cout << "removing " << selected_by_best_hyperplane.size() << "patterns\n" ;
+        selected_by_best_hyperplane.clear();
     }
     return PerceptronNetwork{result};
 }
