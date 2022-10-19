@@ -70,20 +70,6 @@ vector<Pattern> get_nearest_with_different_label(const Pattern& pattern, uint32_
     return result;
 }
 
-// dobra chyba trzeba po prostu inaczej rozwiązać ren układ równań, tylko pamiętać o zaburzeniu macierzy.
-// nie wiem może jakieś przybliżenie iteracyjne
-// albo przepisać na pytonga i svd
-// albo po prostu dobrać jakieś arbitralne wartości tam gdzie jest niejednoznaczność
-// tworzenie hiperpłaszczyzny z svm?
-// a może np iteracyjnie? dopóki maciora jest osobliwa to dopisujemy do coefficients jedynkę i idziemy dalej
-// albo zero
-// nie no to się dobrze nie skończy bo ostatnia kolumna też raczej zawiera same zera
-// może jest jakiś algorytm żeby znaleźć JAKIEŚ rozwiązanie niejednoznacznego układu równań. bo on przecież
-// sprzeczny raczej nie jest
-// może znajdowanie kolumn z samymi zerami i jeśli kolumna p ma same zera, to można wywalić kolumnę
-// i wiersz p i wpisać jedynkę do coefficients vector? i znaleźć rozwiązanie dla reszty
-
-
 bool column_has_only_zeroes(const Matrix& matrix, uint32_t col){
     for(uint32_t i = 0; i < matrix.size(); ++i){
         if(matrix[i][col] != 0) return false;
@@ -99,16 +85,6 @@ vector<uint32_t> find_columns_of_zeroes(const Matrix& matrix){
     return res;
 }
 
-// todo mamy za zadanie znaleźć takie x, Mx = 1
-// no ale hola, nie
-// jeżeli któryś wiersz jest cały zerami to i tak się nie da tego zrobić,
-// więc jest jakoś jeszcze dziwniej
-// może na przypadki? jeśli jest kolumna z samymi zerami (albo macierz osobliwa?) to musi przechodzic
-// przez środek układu współrzędnych i wtedy constant_term jest 0? a jeśli nie to jest 1
-// no to zaraz ... jeżeli to ma przechodzić przez środek układu współrzędnych to jest równanie
-// Ax = 0 i można podstawić za iksa zero i już
-// może poprosić o konsultację z jiaoshou i już
-
 class Rand_double
 {
 public:
@@ -121,7 +97,7 @@ private:
     std::function<double()> r;
 };
 
-Hyperplane lead_through(const vector<Pattern>& patterns){
+Hyperplane lead_through(const vector<Pattern>& patterns, const Pattern& target){
     auto matrix = Matrix (IMAGE_SIZE);
     uint32_t row = 0;
     assert(patterns.size() == IMAGE_SIZE);
@@ -137,7 +113,12 @@ Hyperplane lead_through(const vector<Pattern>& patterns){
     Rand_double rd{-1,1};
     for(uint32_t i = 0; i < matrix.size(); ++i){
         if(column_has_only_zeroes(matrix, i)){
-            res.push_back(rd());
+            if(target.image.pixels[i] != 0){
+                res.push_back(1.0);
+            }
+            else{
+                res.push_back(-0.1)
+            }
         }
         else{
             res.push_back(0.0);
@@ -160,7 +141,7 @@ void Dataset::preprocess(label l, bool dump) {
     for(Pattern& p: patterns){
         if(p.l == l) {
             vector<Pattern> nearest_different_label = get_nearest_with_different_label(p, 784, *this);
-            p.h = make_shared<Hyperplane>(lead_through(nearest_different_label));
+            p.h = make_shared<Hyperplane>(lead_through(nearest_different_label, p));
             if(dump){
                 dump_file << "sample number " << i << " constant " << (*(p.h)).constant_term << " vector: ";
                 for (const double c : (*(p.h)).coefficients_vector) dump_file << c << " ";

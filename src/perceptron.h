@@ -78,5 +78,5 @@ PerceptronNetwork create_to_recognize(label l, Dataset dataset, bool from_prepro
 vector<Pattern> get_all_with_same_side_and_label(const Pattern& p, const Hyperplane& h, Dataset& dataset);
 Pattern get_nearest(vector<Pattern>& patterns, const Hyperplane& h);
 
-Hyperplane lead_through(const vector<Pattern>& patterns);
+Hyperplane lead_through(const vector<Pattern>& patterns, const Pattern& target);
 #endif //PERCEPTRON_PERCEPTRON_H

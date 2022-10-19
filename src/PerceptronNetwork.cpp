@@ -88,7 +88,6 @@ PerceptronNetwork create_to_recognize(label l, Dataset dataset, bool from_prepro
                 // wstawiamy zera tam gdzie trzeba, a jeśli chodzi o pozostałe rzeczy, mamy wolną rękę.
                 // więc zapalamy mocno na minus te piksle które są w patternach przez które prowadzimy, a nie ma ich w wyróżnionej.
                 // a mocno na plus zapalame te, które no odwrotnie.
-                // zresztą idk czy motzno, może być +-1 i może wystarczy
                 precision = ((double) same_side_and_label.size()) /
                         ((double) same_side_and_label.size() + (double) same_side_and_different_label.size());
                 if(precision > best_precision){ // todo if cos innego
