@@ -62,7 +62,7 @@ private:
 public:
     explicit PerceptronNetwork(vector<Perceptron>& perceptrons): perceptrons(std::move(perceptrons)) {}
     void test_on_dataset(const Dataset& dataset, label l);
-    // void test_on_dataset(Dataset test_dataset) const;
+    uint32_t howmany_recognize(const Pattern& p);
     // label infer_for_image(const Image& image) const;
 };
 
