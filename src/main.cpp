@@ -16,6 +16,11 @@
 // started assigning zeroes to non-zero columns and random values (-1, 1) to zero ones
 // F1 score: 0.178946
 // precision: 0.0982653, recall: 1. tbh given the selection method, that was to be expected
+// maximizing distance to hyperplane heuristic
+// todo Each pattern has so many zeros in its grey level image. It is suggested, calculate the mean of
+//  the grey pixels for each image and normalize each grey pixel in between (-1,1) to easy the
+//  algebra problems in computations of the hyperplane.
+//   ^ tak, to ma sens. nie wiem czy nie lepiej between (-4, 4) np. poniewaz numeryka
 int main() {
     const rlim_t stack_size = 134217728; // 128 MiB
     struct rlimit rlim;

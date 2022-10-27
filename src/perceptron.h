@@ -19,7 +19,7 @@ const uint32_t IMAGE_SIZE =  IMAGE_HEIGHT * IMAGE_WIDTH;
 
 class Image{
 public:
-    uint8_t pixels[IMAGE_HEIGHT* IMAGE_WIDTH];
+    double pixels[IMAGE_HEIGHT* IMAGE_WIDTH];
     explicit Image(const uint8_t* bytes);
     double euclidean_distance_squared(const Image& image2) const;
     bool operator==(const Image& that) const;

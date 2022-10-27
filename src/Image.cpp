@@ -4,9 +4,19 @@ Image::Image(const uint8_t* bytes)
 :
 pixels{0}
 {
+    double max = 0;
     for(uint32_t row = 0; row < IMAGE_HEIGHT; ++row){
         for(uint32_t column = 0; column < IMAGE_WIDTH; ++column){
-            pixels[IMAGE_WIDTH * row + column] = bytes[IMAGE_WIDTH * row + column];
+            auto new_element = (double) bytes[IMAGE_WIDTH * row + column];
+            pixels[IMAGE_WIDTH * row + column] = new_element;
+            if(new_element > max){
+                    max = new_element;
+            }
+        }
+    }
+    for(double & pixel : pixels){
+        if(pixel != 0.0){
+            pixel = pixel / max * 2.0 - 1.0; // todo there can be other ways to normalize, e.g. with the mean
         }
     }
 }
@@ -30,7 +40,7 @@ bool Image::operator==(const Image& that) const{
 
 vector<double> Image::to_algebraic_vector() const {
     auto res = vector<double>();
-    for(unsigned char pixel : pixels){
+    for(double pixel : pixels){
         res.push_back(pixel);
     }
     return res;
