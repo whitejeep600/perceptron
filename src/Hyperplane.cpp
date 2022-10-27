@@ -1,4 +1,5 @@
 #include <valarray>
+#include <cassert>
 #include "hyperplane.h"
 #include "utils.h"
 
@@ -45,4 +46,31 @@ void Hyperplane::translate_by_vector(const vector<double> &translation_vector) {
     constant_term += dot_product(coefficients_vector, translation_vector);
 }
 
-
+// czyli wstawiamy zera tam gdzie trzeba, a jeśli chodzi o resztę, to maksymalizujemy
+// odległość do punktu
+Hyperplane lead_through(const vector<Pattern>& patterns, const Pattern& target){
+    auto matrix = Matrix (IMAGE_SIZE);
+    uint32_t row = 0;
+    assert(patterns.size() == IMAGE_SIZE);
+    for(const auto& p: patterns){
+        matrix[row] = std::vector<double>(IMAGE_SIZE);
+        for(uint32_t column = 0; column < IMAGE_SIZE; ++column){
+            matrix[row][column] = p.image.pixels[column];
+        }
+        ++row;
+    }
+    vector<double> res;
+    bool at_least_one_zero = false;
+    for(uint32_t i = 0; i < matrix.size(); ++i){
+        if(column_has_only_zeroes(matrix, i)){
+            res.push_back(target.image.to_algebraic_vector()[i]);
+            at_least_one_zero = true;
+        }
+        else{
+            res.push_back(0.0);
+        }
+    }
+    assert(at_least_one_zero);
+    // we make sure the assumptions for this algorithm were correct
+    return {res, 0.0};
+}

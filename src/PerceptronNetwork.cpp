@@ -67,45 +67,29 @@ PerceptronNetwork create_to_recognize(label l, Dataset dataset, bool from_prepro
     }
     vector<Pattern> same_side_and_label;
     vector<Pattern> same_side_and_different_label;
-    Hyperplane best_hyperplane;
-    vector<Pattern> selected_by_best_hyperplane;
-    double precision;
-    double best_precision;
+    vector<Pattern> biggest_same_side_and_label;
+    Hyperplane associated_with_biggest;
     while(dataset.contains_label(l)){
-        best_precision = 0;
         for(const auto& pattern: dataset.patterns){
             if(pattern.l == l){
                 same_side_and_label = get_all_with_same_side_and_label(pattern, *(pattern.h), dataset);
                 same_side_and_different_label =
                         get_all_with_same_side_and_different_label(pattern, *(pattern.h), dataset);
-                // mozna tu zostaic greedy approach i zamienic kryterium - np precyzje priorytetyzowac
-                // z jednej strony powinna byc priorytetyzowana precyzja. z drugiej strony jesli sie przesadzi,
-                // to bedziemy moze wybierac neurony precyzyjnie rozpoznajace po parę labeli, i skończymy
-                // z masą precycyjnych nerłonów, które razem będą jednak mało precyzyjne...
-                // moze obczaic, ile neuronow srednio rozpoznaje prawdziwy/falszywy label i ustanowic jakis treshhold?
-                // ostatecznie nikt nie mowil ze to ma byc alternatywa po neuronach
-                // no to moze już na etapie przeprowadzania tej płaszczyzny.
-                // wstawiamy zera tam gdzie trzeba, a jeśli chodzi o pozostałe rzeczy, mamy wolną rękę.
-                // więc zapalamy mocno na minus te piksle które są w patternach przez które prowadzimy, a nie ma ich w wyróżnionej.
-                // a mocno na plus zapalame te, które no odwrotnie.
-                precision = ((double) same_side_and_label.size()) /
-                        ((double) same_side_and_label.size() + (double) same_side_and_different_label.size());
-                if(precision > best_precision){ // todo if cos innego
-                    selected_by_best_hyperplane = same_side_and_label;
-                    best_hyperplane = *(pattern.h);
-                    best_precision = precision;
+                if(same_side_and_label.size() > biggest_same_side_and_label.size()) {
+                    biggest_same_side_and_label = same_side_and_label;
+                    associated_with_biggest = *(pattern.h);
                     cout << "selecting neuron with tp " << same_side_and_label.size()
-                    << ", fp " << same_side_and_different_label.size() << "\n";
+                         << ", fp " << same_side_and_different_label.size() << "\n";
                 }
             }
         }
-        Pattern nearest = get_nearest(selected_by_best_hyperplane, best_hyperplane);
-        best_hyperplane.move_halfway_to_point(nearest.image.to_algebraic_vector());
-        result.emplace_back(best_hyperplane,
-                            best_hyperplane.on_positive_side(nearest.image.to_algebraic_vector()));
-        dataset.remove_patterns(selected_by_best_hyperplane);
-        cout << "removing " << selected_by_best_hyperplane.size() << "patterns\n" ;
-        selected_by_best_hyperplane.clear();
+        Pattern nearest = get_nearest(biggest_same_side_and_label, associated_with_biggest);
+        associated_with_biggest.move_halfway_to_point(nearest.image.to_algebraic_vector());
+        result.emplace_back(associated_with_biggest,
+                            associated_with_biggest.on_positive_side(nearest.image.to_algebraic_vector()));
+        dataset.remove_patterns(biggest_same_side_and_label);
+        cout << "removing " << biggest_same_side_and_label.size() << "patterns\n" ;
+        biggest_same_side_and_label.clear();
     }
     return PerceptronNetwork{result};
 }

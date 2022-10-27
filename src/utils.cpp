@@ -152,3 +152,18 @@ Matrix invert_matrix(const Matrix& matrix) {
     return solution;
 }
 
+vector<uint32_t> find_columns_of_zeroes(const Matrix& matrix){
+    vector<uint32_t> res;
+    for(uint32_t i = 0; i < matrix.size(); ++i){
+        if(column_has_only_zeroes(matrix, i)) res.push_back(i);
+    }
+    return res;
+}
+
+bool column_has_only_zeroes(const Matrix& matrix, uint32_t col){
+    for(uint32_t i = 0; i < matrix.size(); ++i){
+        if(matrix[i][col] != 0) return false;
+    }
+    return true;
+}
+

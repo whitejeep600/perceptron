@@ -3,7 +3,6 @@
 #include <fstream>
 #include <iostream>
 #include <functional>
-#include <random>
 #include "perceptron.h"
 #include "utils.h"
 
@@ -70,65 +69,6 @@ vector<Pattern> get_nearest_with_different_label(const Pattern& pattern, uint32_
     return result;
 }
 
-bool column_has_only_zeroes(const Matrix& matrix, uint32_t col){
-    for(uint32_t i = 0; i < matrix.size(); ++i){
-        if(matrix[i][col] != 0) return false;
-    }
-    return true;
-}
-
-vector<uint32_t> find_columns_of_zeroes(const Matrix& matrix){
-    vector<uint32_t> res;
-    for(uint32_t i = 0; i < matrix.size(); ++i){
-        if(column_has_only_zeroes(matrix, i)) res.push_back(i);
-    }
-    return res;
-}
-
-class Rand_double
-{
-public:
-    Rand_double(double low, double high)
-            :r(std::bind(std::uniform_real_distribution<>(low,high),std::default_random_engine())){}
-
-    double operator()(){ return r(); }
-
-private:
-    std::function<double()> r;
-};
-
-Hyperplane lead_through(const vector<Pattern>& patterns, const Pattern& target){
-    auto matrix = Matrix (IMAGE_SIZE);
-    uint32_t row = 0;
-    assert(patterns.size() == IMAGE_SIZE);
-    for(const auto& p: patterns){
-        matrix[row] = std::vector<double>(IMAGE_SIZE);
-        for(uint32_t column = 0; column < IMAGE_SIZE; ++column){
-            matrix[row][column] = p.image.pixels[column];
-        }
-        ++row;
-    }
-    vector<double> res;
-    bool at_least_one_zero = false;
-    Rand_double rd{-1,1};
-    for(uint32_t i = 0; i < matrix.size(); ++i){
-        if(column_has_only_zeroes(matrix, i)){
-            if(target.image.pixels[i] != 0){
-                res.push_back(1.0);
-            }
-            else{
-                res.push_back(-0.1)
-            }
-        }
-        else{
-            res.push_back(0.0);
-            at_least_one_zero = true;
-        }
-    }
-    assert(at_least_one_zero);
-    return {res, 0.0};
-
-}
 
 void Dataset::preprocess(label l, bool dump) {
     // This only needs to be done once for each pattern while training to recognize a single label.

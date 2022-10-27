@@ -24,5 +24,8 @@ vector<double> sum_by_row(Matrix& A, uint32_t n) ;
 
 Matrix invert_matrix(const Matrix& matrix);
 
+bool column_has_only_zeroes(const Matrix& matrix, uint32_t col);
+
+vector<uint32_t> find_columns_of_zeroes(const Matrix& matrix);
 
 #endif //PERCEPTRON_UTILS_H
