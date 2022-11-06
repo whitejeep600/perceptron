@@ -46,6 +46,14 @@ void Hyperplane::translate_by_vector(const vector<double> &translation_vector) {
     constant_term += dot_product(coefficients_vector, translation_vector);
 }
 
+double average_of_ith_column(const Matrix& matrix, uint32_t column){
+    double sum = 0;
+    for(uint32_t i = 0; i < matrix.size(); ++i){
+        sum += matrix[i][column];
+    }
+    return sum / (double) matrix.size();
+}
+
 // czyli wstawiamy zera tam gdzie trzeba, a jeśli chodzi o resztę, to maksymalizujemy
 // odległość do punktu
 Hyperplane lead_through(const vector<Pattern>& patterns, const Pattern& target){
@@ -60,17 +68,44 @@ Hyperplane lead_through(const vector<Pattern>& patterns, const Pattern& target){
         ++row;
     }
     vector<double> res;
-    bool at_least_one_zero = false;
+    bool at_least_one_nonzero = false;
     for(uint32_t i = 0; i < matrix.size(); ++i){
         if(column_has_only_zeroes(matrix, i)){
-            res.push_back(target.image.to_algebraic_vector()[i]);
-            at_least_one_zero = true;
+            res.push_back(target.image.pixels[i]);
+            if(target.image.pixels[i] != 0){
+                at_least_one_nonzero = true;
+            }
         }
         else{
             res.push_back(0.0);
         }
     }
-    assert(at_least_one_zero);
-    // we make sure the assumptions for this algorithm were correct
-    return {res, 0.0};
+    if(at_least_one_nonzero){
+        return {res, 0.0};
+    }
+    else{
+        res.clear();
+        for(uint32_t i = 0; i < matrix.size(); ++i){
+            res.push_back(target.image.pixels[i] - average_of_ith_column(matrix, i));
+        }
+        double mean_pattern_dot_product = 0;
+        for(auto& p: patterns){
+            mean_pattern_dot_product += dot_product(p.image.to_algebraic_vector(), res);
+        }
+        mean_pattern_dot_product /= (double) patterns.size();
+        double target_dot_product = dot_product(target.image.to_algebraic_vector(), res);
+        assert(target_dot_product > mean_pattern_dot_product);
+        return {res, mean_pattern_dot_product +
+                     0.1 * (target_dot_product - mean_pattern_dot_product)};
+                     // ^ this can be adjusted, maybe should be 0 bc the
+                     // hyperplane is moved halfway to the target pattern
+                     // anyway later on
+        // dobra, to jest jednak za słabe, trzeba przesunąć ten constant term
+    }
+
+    // no ale może powinnismy dążyć do tego żeby dla tamtych było jednak
+    // blisko zera, a nie na minus. wtedy najprostsza metoda to chyba policzyc
+    // ile średnio daje dot product tych patternów z c, i wstawić to za wolną
+    // konopię
+
 }

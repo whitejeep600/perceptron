@@ -70,6 +70,9 @@ vector<Image> read_images(const char* filename, uint32_t expected_num_images){
     for(uint32_t i = 0; i < num_images; ++i){
         images.emplace_back((uint8_t*)  buffer + 16 + i * IMAGE_SIZE);
     }
+    for(auto& i: images){
+        assert(i.pixels[0] == 0);
+    }
     return images;
 }
 
