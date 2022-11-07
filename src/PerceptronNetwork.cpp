@@ -1,13 +1,10 @@
 #include <iostream>
 #include <utility>
-#include <memory>
 #include <algorithm>
 #include <numeric>
+#include <map>
 #include "perceptron.h"
 #include "hyperplane.h"
-#include "utils.h"
-// I ended up using this library for Matrix inversions.
-// Surprisingly no more 'normal' library is available
 
 using namespace std;
 
@@ -109,6 +106,20 @@ uint32_t PerceptronNetwork::howmany_recognize(const Pattern& pattern){
     return howmany;
 }
 
+template<class T>
+map<T, uint32_t> get_counts(const vector<T>& vec){
+    auto values = set<T>();
+    for(const auto howmany: vec){
+        values.insert(howmany);
+    }
+    auto counts = std::map<T, uint32_t>();
+    for(const auto value: values){
+        counts.insert({value,
+                          count(vec.begin(), vec.end(), value)});
+    }
+    return counts;
+}
+
 void PerceptronNetwork::test_on_dataset(const Dataset& dataset, label l) {
     uint32_t all = dataset.patterns.size();
     uint32_t true_positives = 0;
@@ -145,6 +156,16 @@ void PerceptronNetwork::test_on_dataset(const Dataset& dataset, label l) {
     cout << ", true negatives: " << true_negatives << ", false negatives: " << false_negatives << ".\n";
     cout << "precision: " << precision << ", recall: " << recall << ".\n";
     cout << "F1 score: " << F1 << ".\n";
-    cout << "average neurons active for tp: " << reduce(howmany_recognize_tp.begin(), howmany_recognize_tp.end()) / (double) howmany_recognize_tp.size() << "\n.";
-    cout << "average neurons active for fp: " << reduce(howmany_recognize_fp.begin(), howmany_recognize_fp.end()) / (double) howmany_recognize_fp.size() << "\n.";
+    cout << "average neurons active for tp: " << reduce(howmany_recognize_tp.begin(), howmany_recognize_tp.end()) / (double) howmany_recognize_tp.size() << ".\n";
+    cout << "average neurons active for fp: " << reduce(howmany_recognize_fp.begin(), howmany_recognize_fp.end()) / (double) howmany_recognize_fp.size() << ".\n";
+    auto tp_counts = get_counts(howmany_recognize_tp);
+    auto fp_counts = get_counts(howmany_recognize_fp);
+    cout << "precise counts of neurons recognizing true positive values:\n";
+    for(const auto count: tp_counts){
+        cout << count.second << " patterns recognized by exactly " << count.first << " neurons.\n";
+    }
+    cout << "precise counts of neurons recognizing false positive values:\n";
+    for(const auto count: fp_counts){
+        cout << count.second << " patterns recognized by exactly " << count.first << " neurons.\n";
+    }
 }

@@ -96,7 +96,7 @@ Hyperplane lead_through(const vector<Pattern>& patterns, const Pattern& target){
         double target_dot_product = dot_product(target.image.to_algebraic_vector(), res);
         assert(target_dot_product > mean_pattern_dot_product);
         return {res, mean_pattern_dot_product +
-                     0.1 * (target_dot_product - mean_pattern_dot_product)};
+                     0.3 * (target_dot_product - mean_pattern_dot_product)};
                      // ^ this can be adjusted, maybe should be 0 bc the
                      // hyperplane is moved halfway to the target pattern
                      // anyway later on
