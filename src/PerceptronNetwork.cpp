@@ -48,20 +48,10 @@ Pattern get_nearest(vector<Pattern>& patterns, const Hyperplane& h){
     return patterns[0];
 }
 
-// Create a vector of perceptrons to recognize label l based on the dataset. If any of the
-// resulting perceptrons light up for a pattern, it will be assigned the label l.
-PerceptronNetwork create_to_recognize(label l, Dataset dataset, bool from_preprocessed){
+vector<Perceptron> create_neurons(label l, Dataset dataset){
     // passing dataset by value because it's convenient to remove stuff from it while learning,
     // but we don't want this to affect the original dataset
     vector<Perceptron> result;
-    if(from_preprocessed){
-        dataset.preprocess_from_dump(l);
-        // change this to dataset.preprocess(l, true) to dump the preprocessing results to file
-    }
-    else{
-        //dataset.preprocess(l, false);
-        dataset.preprocess(l, true);
-    }
     vector<Pattern> same_side_and_label;
     vector<Pattern> same_side_and_different_label;
     vector<Pattern> biggest_same_side_and_label;
@@ -88,7 +78,20 @@ PerceptronNetwork create_to_recognize(label l, Dataset dataset, bool from_prepro
         cout << "removing " << biggest_same_side_and_label.size() << "patterns\n" ;
         biggest_same_side_and_label.clear();
     }
-    return PerceptronNetwork{result};
+    return result;
+}
+
+// Create a vector of perceptrons to recognize label l based on the dataset. If any of the
+// resulting perceptrons light up for a pattern, it will be assigned the label l.
+PerceptronNetwork create_to_recognize(label l, Dataset& dataset, bool from_preprocessed){
+    if(from_preprocessed){
+        dataset.preprocess_from_dump(l);
+    }
+    else{
+        dataset.preprocess(l, true);
+    }
+    auto result = create_neurons(l, dataset);
+    return PerceptronNetwork{result, 0};
 }
 
 bool PerceptronNetwork::recognizes(const Pattern &pattern) {

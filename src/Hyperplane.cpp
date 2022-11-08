@@ -102,10 +102,4 @@ Hyperplane lead_through(const vector<Pattern>& patterns, const Pattern& target){
                      // anyway later on
         // dobra, to jest jednak za słabe, trzeba przesunąć ten constant term
     }
-
-    // no ale może powinnismy dążyć do tego żeby dla tamtych było jednak
-    // blisko zera, a nie na minus. wtedy najprostsza metoda to chyba policzyc
-    // ile średnio daje dot product tych patternów z c, i wstawić to za wolną
-    // konopię
-
 }

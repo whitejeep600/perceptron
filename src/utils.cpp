@@ -1,8 +1,6 @@
 #include <valarray>
 #include <cassert>
-#include <random>
 #include "utils.h"
-#include "perceptron.h"
 
 
 double dot_product(const vector<double>& vec1, const vector<double>& vec2) {

@@ -42,7 +42,7 @@ public:
     explicit Dataset(const vector<Pattern> &patterns);
     bool contains_label(label l) const;
     void remove_patterns(const vector<Pattern>& to_remove);
-    void preprocess(label l, bool dump);
+    void preprocess(label l, bool dump_to_file);
     void preprocess_from_dump(label l);
 };
 
@@ -58,18 +58,21 @@ public:
 class PerceptronNetwork{
 private:
     vector<Perceptron> perceptrons;
+    uint32_t treshhold;
     bool recognizes(const Pattern& p);
 public:
-    explicit PerceptronNetwork(vector<Perceptron>& perceptrons): perceptrons(std::move(perceptrons)) {}
+    explicit PerceptronNetwork(vector<Perceptron>& perceptrons, uint32_t treshhold)
+    :
+    perceptrons(std::move(perceptrons)), treshhold(treshhold) {}
     void test_on_dataset(const Dataset& dataset, label l);
     uint32_t howmany_recognize(const Pattern& p);
-    // label infer_for_image(const Image& image) const;
+
 };
 
 Dataset read_train_dataset();
 Dataset read_test_dataset();
 
-PerceptronNetwork create_to_recognize(label l, Dataset dataset, bool from_preprocessed);
+PerceptronNetwork create_to_recognize(label l, Dataset& dataset, bool from_preprocessed);
 
 // todo niepotrzebne rzeczy z naglowkow do wywalenia
 

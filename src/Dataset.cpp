@@ -70,19 +70,19 @@ vector<Pattern> get_nearest_with_different_label(const Pattern& pattern, uint32_
 }
 
 
-void Dataset::preprocess(label l, bool dump) {
+void Dataset::preprocess(label l, bool dump_to_file) {
     // This only needs to be done once for each pattern while training to recognize a single label.
-    // Also it begs for parallelizing, computation for each pattern is independent
+    // Also if we're being honest it begs for parallelizing, computation for each pattern is independent.
     uint32_t i = 0;
     std::ofstream dump_file;
-    if(dump){
+    if(dump_to_file){
         dump_file = std::ofstream("../data/train_hyperplanes_dump.txt");
     }
     for(Pattern& p: patterns){
         if(p.l == l) {
             vector<Pattern> nearest_different_label = get_nearest_with_different_label(p, 784, *this);
             p.h = make_shared<Hyperplane>(lead_through(nearest_different_label, p));
-            if(dump){
+            if(dump_to_file){
                 dump_file << "sample number " << i << " constant " << (*(p.h)).constant_term << " vector: ";
                 for (const double c : (*(p.h)).coefficients_vector) dump_file << c << " ";
                 dump_file << "\n";
@@ -91,7 +91,7 @@ void Dataset::preprocess(label l, bool dump) {
         }
         ++i;
     }
-    if(dump){
+    if(dump_to_file){
         dump_file.close();
     }
 }

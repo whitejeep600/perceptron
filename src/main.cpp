@@ -1,12 +1,9 @@
-#include <cassert>
 #include <algorithm>
-#include <iostream>
 #include "perceptron.h"
-#include "test.h"
-#include "utils.h"
 
-// może jednak jeszcze jeden test xd
-// do raportu: rozkmina z przeprowadzaniem hiperpłaszczyzny, z przesunięciem o wektor, eigen i problem
+
+// do raportu: rozkmina z przeprowadzaniem hiperpłaszczyzny, z przesunięciem o wektor (algebra),
+// eigen i problem
 // z pamięcią, problem z czasem wykonania i dumpowanie do pliku - fajnie że jest w ogóle możliwe bo
 // wykonywane są pewne obliczenia raz dla każdego patternu i mają łatwy do zdumpowania wynik.
 // paper XD
@@ -27,14 +24,13 @@
 // become numerically independent
 // When these 784 patterns are degenerative with less dimensions, < 784, one can still work out the one with maximum distance.
 // Later in the class, I will show you a simple approach included in Chapter 5.
+// choosing the constant adjusting the constant term
+// choosing the behavior of the final neuron
+// todo constant i private co mozna
 int main() {
-    const rlim_t stack_size = 134217728; // 128 MiB
-    struct rlimit rlim;
-    rlim.rlim_cur = stack_size;
-    setrlimit(RLIMIT_STACK, &rlim);
     auto train_dataset = read_train_dataset();
     label l = 0;
-    auto network = create_to_recognize(l, train_dataset, false);
+    auto network = create_to_recognize(l, train_dataset, true);
     network.test_on_dataset(read_test_dataset(), l);
     return 0;
 }
