@@ -90,15 +90,23 @@ PerceptronNetwork create_to_recognize(label l, Dataset& dataset, bool from_prepr
     else{
         dataset.preprocess(l, true);
     }
-    auto result = create_neurons(l, dataset);
-    return PerceptronNetwork{result, 0};
+    auto neurons = create_neurons(l, dataset);
+    double best_F1 = 0;
+    double F1;
+    uint32_t best_treshold = 0;
+    for(uint32_t treshold = 0; treshold <= neurons.size(); ++treshold){
+        F1 = PerceptronNetwork(neurons, treshold).test_on_dataset(dataset, l, false);
+        cout << "achieved F1=" << F1 << " for treshold " << treshold << "\n";
+        if(F1 > best_F1){
+            best_F1 = F1;
+            best_treshold = treshold;
+        }
+    }
+    return PerceptronNetwork{neurons, best_treshold};
 }
 
 bool PerceptronNetwork::recognizes(const Pattern &pattern) {
-    for(auto& perceptron: perceptrons){
-        if(perceptron.recognizes(pattern)) return true;
-    }
-    return false;
+    return howmany_recognize(pattern) >= treshold;
 }
 
 uint32_t PerceptronNetwork::howmany_recognize(const Pattern& pattern){
@@ -109,6 +117,8 @@ uint32_t PerceptronNetwork::howmany_recognize(const Pattern& pattern){
     return howmany;
 }
 
+// todo moze to do utils
+// todo kolejnosc wszystkich funkcji etc plikach
 template<class T>
 map<T, uint32_t> get_counts(const vector<T>& vec){
     auto values = set<T>();
@@ -123,7 +133,7 @@ map<T, uint32_t> get_counts(const vector<T>& vec){
     return counts;
 }
 
-void PerceptronNetwork::test_on_dataset(const Dataset& dataset, label l) {
+double PerceptronNetwork::test_on_dataset(const Dataset& dataset, label l, bool print_details) {
     uint32_t all = dataset.patterns.size();
     uint32_t true_positives = 0;
     uint32_t false_positives = 0;
@@ -154,21 +164,12 @@ void PerceptronNetwork::test_on_dataset(const Dataset& dataset, label l) {
     double precision = ((double) true_positives) / (true_positives + false_positives);
     double recall = ((double) true_positives) / (true_positives + false_negatives);
     double F1 = ((double) 2.0) * precision * recall / (precision + recall);
-    cout << "dataset size: " << all << ".\n";
-    cout << "true positives: " << true_positives << ", false positives: " << false_positives;
-    cout << ", true negatives: " << true_negatives << ", false negatives: " << false_negatives << ".\n";
-    cout << "precision: " << precision << ", recall: " << recall << ".\n";
-    cout << "F1 score: " << F1 << ".\n";
-    cout << "average neurons active for tp: " << reduce(howmany_recognize_tp.begin(), howmany_recognize_tp.end()) / (double) howmany_recognize_tp.size() << ".\n";
-    cout << "average neurons active for fp: " << reduce(howmany_recognize_fp.begin(), howmany_recognize_fp.end()) / (double) howmany_recognize_fp.size() << ".\n";
-    auto tp_counts = get_counts(howmany_recognize_tp);
-    auto fp_counts = get_counts(howmany_recognize_fp);
-    cout << "precise counts of neurons recognizing true positive values:\n";
-    for(const auto count: tp_counts){
-        cout << count.second << " patterns recognized by exactly " << count.first << " neurons.\n";
+    if (print_details) {
+        cout << "dataset size: " << all << ".\n";
+        cout << "true positives: " << true_positives << ", false positives: " << false_positives;
+        cout << ", true negatives: " << true_negatives << ", false negatives: " << false_negatives << ".\n";
+        cout << "precision: " << precision << ", recall: " << recall << ".\n";
+        cout << "F1 score: " << F1 << ".\n";
     }
-    cout << "precise counts of neurons recognizing false positive values:\n";
-    for(const auto count: fp_counts){
-        cout << count.second << " patterns recognized by exactly " << count.first << " neurons.\n";
-    }
+    return F1;
 }

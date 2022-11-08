@@ -58,13 +58,13 @@ public:
 class PerceptronNetwork{
 private:
     vector<Perceptron> perceptrons;
-    uint32_t treshhold;
+    uint32_t treshold;
     bool recognizes(const Pattern& p);
 public:
     explicit PerceptronNetwork(vector<Perceptron>& perceptrons, uint32_t treshhold)
     :
-    perceptrons(std::move(perceptrons)), treshhold(treshhold) {}
-    void test_on_dataset(const Dataset& dataset, label l);
+            perceptrons(std::move(perceptrons)), treshold(treshhold) {}
+    double test_on_dataset(const Dataset& dataset, label l, bool print_details);
     uint32_t howmany_recognize(const Pattern& p);
 
 };

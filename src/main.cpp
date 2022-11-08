@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <iostream>
 #include "perceptron.h"
 
 
@@ -31,6 +32,7 @@ int main() {
     auto train_dataset = read_train_dataset();
     label l = 0;
     auto network = create_to_recognize(l, train_dataset, true);
-    network.test_on_dataset(read_test_dataset(), l);
+    cout << "Testing on the test dataset.\n";
+    network.test_on_dataset(read_test_dataset(), l, true);
     return 0;
 }
