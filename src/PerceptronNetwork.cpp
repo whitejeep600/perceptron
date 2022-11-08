@@ -106,12 +106,12 @@ PerceptronNetwork create_to_recognize(label l, Dataset& dataset, bool from_prepr
 }
 
 bool PerceptronNetwork::recognizes(const Pattern &pattern) {
-    return howmany_recognize(pattern) >= treshold;
+    return this->howmany_recognize(pattern) >= this->treshold;
 }
 
 uint32_t PerceptronNetwork::howmany_recognize(const Pattern& pattern){
     uint32_t howmany = 0;
-    for(auto& perceptron: perceptrons){
+    for(auto& perceptron: this->perceptrons){
         if(perceptron.recognizes(pattern)) ++howmany;
     }
     return howmany;
