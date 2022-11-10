@@ -23,24 +23,19 @@
 // to choosing the arbitrary coefficients I mentioned in the previous
 // e-mail, or slightly perturb each of the training patterns so that they
 // become numerically independent
-// When these 784 patterns are degenerative with less dimensions, < 784, one can still work out the one with maximum distance.
-// Later in the class, I will show you a simple approach included in Chapter 5.
 // choosing the constant adjusting the constant term
 // choosing the behavior of the final neuron
 // todo constant i private co mozna
 // in the final stages, preprocessing took about 3/4ths of the whole time so its good
 // that results were dumped
 // experimenting with the mean constant in Hyperplane.cpp
-// jak patrzę na te niurony to kilka ostatnich jest i tak do kitu,
-// można by je wywalić. bo ona mają jakoś 1% precyzję, więc nic nie dają
-// w kontekście zwiększania liczby neuronów aktywnych dla tp, natomiast
-// zwiększają zapewne istotnie dla fp
-// więc można np. przyjąć takie kryterium że przestajemy wybierać neurony w momencie kiedy
-// usunęliśmy z datasetu już 90% patternów
+
 // no i nie zapominajmy że w dalszym ciągu premiujemy dużą liczbę true positives,
 // a nie karzemy za dużą liczbę false positives. wybór na podstawie tp/fp skutkuje
 // często wybieraniem nerłonów które usuwają po parę patternów z datasetu, więc
-// można spróbować tp*tp/fp
+// można spróbować tp*tp/fp albo nawet tp^3 / fp
+// no i zachowanie tego ostatniego niuronu. może niech liczy średnią ważoną
+// z wyników tych neuronów, ważoną ich precyzja, i ustala jakiś znowuż treshold?
 int main() {
     auto train_dataset = read_train_dataset();
     label l = 0;

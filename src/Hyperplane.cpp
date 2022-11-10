@@ -98,6 +98,8 @@ Hyperplane lead_through(const vector<Pattern>& patterns, const Pattern& target){
                      // ^ this can be adjusted, maybe should be 0 bc the
                      // hyperplane is moved halfway to the target pattern
                      // anyway later on
-        // hola, a czemu tu jest zawsze zakładane że nasz pattern jest nad płaszczyzną
+                     // zasadniczo można ten współczynnik dobierać
+                     // dynamicznie za każdym razem, np wypróbowywać
+                     // kilka wartości i patrzeć która działa najlepiej
     }
 }

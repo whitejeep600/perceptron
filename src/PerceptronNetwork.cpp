@@ -54,30 +54,34 @@ vector<Perceptron> create_neurons(label l, Dataset dataset){
     vector<Perceptron> result;
     vector<Pattern> same_side_and_label;
     vector<Pattern> same_side_and_different_label;
-    vector<Pattern> biggest_same_side_and_label;
-    Hyperplane associated_with_biggest;
-    auto original_count = dataset.howmany_of_label(l);
-    while(dataset.howmany_of_label(l) >= original_count / 20){
+    vector<Pattern> best_same_side_and_label;
+    Hyperplane associated_with_best;
+    double metric;
+    double best_metric = 0;
+    while(dataset.contains_label(l)){
         for(const auto& pattern: dataset.patterns){
             if(pattern.l == l){
                 same_side_and_label = get_all_with_same_side_and_label(pattern, *(pattern.h), dataset);
                 same_side_and_different_label =
                         get_all_with_same_side_and_different_label(pattern, *(pattern.h), dataset);
-                if(same_side_and_label.size() > biggest_same_side_and_label.size()) {
-                    biggest_same_side_and_label = same_side_and_label;
-                    associated_with_biggest = *(pattern.h);
+                metric = (double) (same_side_and_label.size() * same_side_and_label.size()) /
+                        (double) same_side_and_different_label.size();
+                if(metric > best_metric) {
+                    best_metric = metric;
+                    best_same_side_and_label = same_side_and_label;
+                    associated_with_best = *(pattern.h);
                     cout << "selecting neuron with tp " << same_side_and_label.size()
                          << ", fp " << same_side_and_different_label.size() << "\n";
                 }
             }
         }
-        Pattern nearest = get_nearest(biggest_same_side_and_label, associated_with_biggest);
-        associated_with_biggest.move_halfway_to_point(nearest.image.to_algebraic_vector());
-        result.emplace_back(associated_with_biggest,
-                            associated_with_biggest.on_positive_side(nearest.image.to_algebraic_vector()));
-        dataset.remove_patterns(biggest_same_side_and_label);
-        cout << "removing " << biggest_same_side_and_label.size() << "patterns\n" ;
-        biggest_same_side_and_label.clear();
+        Pattern nearest = get_nearest(best_same_side_and_label, associated_with_best);
+        associated_with_best.move_halfway_to_point(nearest.image.to_algebraic_vector());
+        result.emplace_back(associated_with_best,
+                            associated_with_best.on_positive_side(nearest.image.to_algebraic_vector()));
+        dataset.remove_patterns(best_same_side_and_label);
+        cout << "removing " << best_same_side_and_label.size() << "patterns\n" ;
+        best_same_side_and_label.clear();
     }
     return result;
 }
