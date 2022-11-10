@@ -41,6 +41,7 @@ public:
     explicit Dataset(const vector<Image>& images, const vector<label>& labels);
     explicit Dataset(const vector<Pattern> &patterns);
     bool contains_label(label l) const;
+    uint32_t howmany_of_label(label l) const;
     void remove_patterns(const vector<Pattern>& to_remove);
     void preprocess(label l, bool dump_to_file);
     void preprocess_from_dump(label l);

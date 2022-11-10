@@ -54,8 +54,6 @@ double average_of_ith_column(const Matrix& matrix, uint32_t column){
     return sum / (double) matrix.size();
 }
 
-// czyli wstawiamy zera tam gdzie trzeba, a jeśli chodzi o resztę, to maksymalizujemy
-// odległość do punktu
 Hyperplane lead_through(const vector<Pattern>& patterns, const Pattern& target){
     auto matrix = Matrix (IMAGE_SIZE);
     uint32_t row = 0;
@@ -100,6 +98,6 @@ Hyperplane lead_through(const vector<Pattern>& patterns, const Pattern& target){
                      // ^ this can be adjusted, maybe should be 0 bc the
                      // hyperplane is moved halfway to the target pattern
                      // anyway later on
-        // dobra, to jest jednak za słabe, trzeba przesunąć ten constant term
+        // hola, a czemu tu jest zawsze zakładane że nasz pattern jest nad płaszczyzną
     }
 }

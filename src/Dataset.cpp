@@ -129,4 +129,14 @@ void Dataset::preprocess_from_dump(label l) {
     dump_file.close();
 }
 
+uint32_t Dataset::howmany_of_label(label l) const {
+    uint32_t res = 0;
+    for(Pattern p: this->patterns){
+        if(p.l == l){
+            ++ res;
+        }
+    }
+    return res;
+}
+
 

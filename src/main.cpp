@@ -28,10 +28,23 @@
 // choosing the constant adjusting the constant term
 // choosing the behavior of the final neuron
 // todo constant i private co mozna
+// in the final stages, preprocessing took about 3/4ths of the whole time so its good
+// that results were dumped
+// experimenting with the mean constant in Hyperplane.cpp
+// jak patrzę na te niurony to kilka ostatnich jest i tak do kitu,
+// można by je wywalić. bo ona mają jakoś 1% precyzję, więc nic nie dają
+// w kontekście zwiększania liczby neuronów aktywnych dla tp, natomiast
+// zwiększają zapewne istotnie dla fp
+// więc można np. przyjąć takie kryterium że przestajemy wybierać neurony w momencie kiedy
+// usunęliśmy z datasetu już 90% patternów
+// no i nie zapominajmy że w dalszym ciągu premiujemy dużą liczbę true positives,
+// a nie karzemy za dużą liczbę false positives. wybór na podstawie tp/fp skutkuje
+// często wybieraniem nerłonów które usuwają po parę patternów z datasetu, więc
+// można spróbować tp*tp/fp
 int main() {
     auto train_dataset = read_train_dataset();
     label l = 0;
-    auto network = create_to_recognize(l, train_dataset, false);
+    auto network = create_to_recognize(l, train_dataset, true);
     cout << "Testing on the test dataset.\n";
     network.test_on_dataset(read_test_dataset(), l, true);
     return 0;

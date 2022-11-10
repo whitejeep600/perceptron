@@ -56,7 +56,8 @@ vector<Perceptron> create_neurons(label l, Dataset dataset){
     vector<Pattern> same_side_and_different_label;
     vector<Pattern> biggest_same_side_and_label;
     Hyperplane associated_with_biggest;
-    while(dataset.contains_label(l)){
+    auto original_count = dataset.howmany_of_label(l);
+    while(dataset.howmany_of_label(l) >= original_count / 20){
         for(const auto& pattern: dataset.patterns){
             if(pattern.l == l){
                 same_side_and_label = get_all_with_same_side_and_label(pattern, *(pattern.h), dataset);
