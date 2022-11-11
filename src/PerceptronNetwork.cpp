@@ -57,8 +57,8 @@ vector<Perceptron> create_neurons(label l, Dataset dataset){
     vector<Pattern> best_same_side_and_label;
     Hyperplane associated_with_best;
     double metric;
-    double best_metric = 0;
     while(dataset.contains_label(l)){
+        double best_metric = 0;
         for(const auto& pattern: dataset.patterns){
             if(pattern.l == l){
                 same_side_and_label = get_all_with_same_side_and_label(pattern, *(pattern.h), dataset);
@@ -96,6 +96,8 @@ PerceptronNetwork create_to_recognize(label l, Dataset& dataset, bool from_prepr
         dataset.preprocess(l, true);
     }
     auto neurons = create_neurons(l, dataset);
+    // w tym momencie mamy jakieśtam neurony, i możemy na ich podstawie wytrenować jakąś
+    // regresję logistyczną na ostatnim neuronie nawet
     double best_F1 = 0;
     double F1;
     uint32_t best_treshold = 0;
