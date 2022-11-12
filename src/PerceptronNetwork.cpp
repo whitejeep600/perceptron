@@ -65,7 +65,7 @@ vector<Perceptron> create_neurons(label l, Dataset dataset){
                 same_side_and_different_label =
                         get_all_with_same_side_and_different_label(pattern, *(pattern.h), dataset);
                 metric = (double) (same_side_and_label.size() * same_side_and_label.size()) /
-                        (double) same_side_and_different_label.size();
+                        ((double) same_side_and_different_label.size() + 10);
                 if(metric > best_metric) {
                     best_metric = metric;
                     best_same_side_and_label = same_side_and_label;

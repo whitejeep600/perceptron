@@ -36,6 +36,9 @@
 // można spróbować tp*tp/fp albo nawet tp^3 / fp
 // no i zachowanie tego ostatniego niuronu. może niech liczy średnią ważoną
 // z wyników tych neuronów, ważoną ich precyzja, i ustala jakiś znowuż treshold?
+// tp*tp/fp przedstawia dwa problemy - jeden to dzielenie przez zero xd
+// (choć przez jakiś quirk c++owego porównania to chyba nie jest problem)
+// a drugi to zbyt duże premiowanie leszczów z tp=1, fp=0
 int main() {
     auto train_dataset = read_train_dataset();
     label l = 0;
