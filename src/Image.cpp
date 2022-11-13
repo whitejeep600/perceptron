@@ -15,6 +15,7 @@ pixels{0}
         }
     }
     for(double & pixel : pixels){
+        // Normalizing to range[-1, 1] for better algebraic properties
         if(pixel != 0.0){
             pixel = pixel / max * 2.0 - 1.0;
         }
@@ -38,11 +39,16 @@ bool Image::operator==(const Image& that) const{
     return true;
 }
 
-vector<double> Image::to_algebraic_vector() const {
+vector<double> Image::create_algebraic_vector() const{
     auto res = vector<double>();
     for(double pixel : pixels){
         res.push_back(pixel);
     }
+    return res;
+}
+
+vector<double> Image::to_algebraic_vector() const {
+    static auto res = this->create_algebraic_vector();
     return res;
 }
 

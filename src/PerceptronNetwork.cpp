@@ -1,38 +1,13 @@
 #include <iostream>
 #include <utility>
 #include <algorithm>
-#include <numeric>
-#include <map>
 #include <fstream>
 #include <cassert>
 #include "perceptron.h"
 #include "hyperplane.h"
+#include "utils.h"
 
 using namespace std;
-
-vector<Pattern> get_all_with_same_side_and_label(const Pattern& target, const Hyperplane& h, Dataset& dataset){
-    vector<Pattern> result;
-    for(Pattern& p: dataset.patterns){
-        if(p.l == target.l and h.on_same_side(target.image.to_algebraic_vector(),
-                                              p.image.to_algebraic_vector())){
-            result.push_back(p);
-        }
-    }
-    return result;
-}
-
-vector<Pattern> get_all_with_same_side_and_different_label(const Pattern& target,
-                                                           const Hyperplane& h,
-                                                           Dataset& dataset){
-    vector<Pattern> result;
-    for(Pattern& p: dataset.patterns){
-        if(p.l != target.l and h.on_same_side(target.image.to_algebraic_vector(),
-                                              p.image.to_algebraic_vector())){
-            result.push_back(p);
-        }
-    }
-    return result;
-}
 
 Pattern get_nearest(vector<Pattern>& patterns, const Hyperplane& h){
     struct key
@@ -98,14 +73,11 @@ PerceptronNetwork create_to_recognize(label l, Dataset&& dataset, bool from_prep
         dataset.preprocess(l, true);
     }
     auto neurons = create_neurons(l, dataset);
-    // w tym momencie mamy jakieśtam neurony, i możemy na ich podstawie wytrenować jakąś
-    // regresję logistyczną na ostatnim neuronie nawet
     double best_F1 = 0;
     double F1;
     uint32_t best_treshold = 0;
     for(uint32_t treshold = 0; treshold <= neurons.size(); ++treshold){
         F1 = PerceptronNetwork(neurons, treshold).test_on_dataset(dataset, l, false);
-        cout << "achieved F1=" << F1 << " for treshold " << treshold << "\n";
         if(F1 > best_F1){
             best_F1 = F1;
             best_treshold = treshold;
@@ -114,11 +86,11 @@ PerceptronNetwork create_to_recognize(label l, Dataset&& dataset, bool from_prep
     return PerceptronNetwork{neurons, best_treshold};
 }
 
-bool PerceptronNetwork::recognizes(const Pattern &pattern) {
+bool PerceptronNetwork::recognizes(const Pattern &pattern) const {
     return this->howmany_recognize(pattern) >= this->treshold;
 }
 
-uint32_t PerceptronNetwork::howmany_recognize(const Pattern& pattern){
+uint32_t PerceptronNetwork::howmany_recognize(const Pattern& pattern) const {
     uint32_t howmany = 0;
     for(auto& perceptron: this->perceptrons){
         if(perceptron.recognizes(pattern)) ++howmany;
@@ -126,23 +98,7 @@ uint32_t PerceptronNetwork::howmany_recognize(const Pattern& pattern){
     return howmany;
 }
 
-// todo moze to do utils
-// todo kolejnosc wszystkich funkcji etc plikach
-template<class T>
-map<T, uint32_t> get_counts(const vector<T>& vec){
-    auto values = set<T>();
-    for(const auto howmany: vec){
-        values.insert(howmany);
-    }
-    auto counts = std::map<T, uint32_t>();
-    for(const auto value: values){
-        counts.insert({value,
-                          count(vec.begin(), vec.end(), value)});
-    }
-    return counts;
-}
-
-double PerceptronNetwork::test_on_dataset(const Dataset& dataset, label l, bool print_details) {
+double PerceptronNetwork::test_on_dataset(const Dataset& dataset, label l, bool print_details) const {
     uint32_t all = dataset.patterns.size();
     uint32_t true_positives = 0;
     uint32_t false_positives = 0;
@@ -154,7 +110,6 @@ double PerceptronNetwork::test_on_dataset(const Dataset& dataset, label l, bool 
         if(pattern.l == l){
             if(this->recognizes(pattern)){
                 ++true_positives;
-                howmany_recognize_tp.push_back(howmany_recognize(pattern));
             }
             else{
                 ++false_negatives;
@@ -163,7 +118,6 @@ double PerceptronNetwork::test_on_dataset(const Dataset& dataset, label l, bool 
         else{
             if(this->recognizes(pattern)){
                 ++false_positives;
-                howmany_recognize_fp.push_back(howmany_recognize(pattern));
             }
             else{
                 ++true_negatives;

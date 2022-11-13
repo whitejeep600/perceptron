@@ -16,8 +16,9 @@ const uint32_t IMAGE_HEIGHT = 28;
 const uint32_t IMAGE_WIDTH = 28;
 const uint32_t IMAGE_SIZE =  IMAGE_HEIGHT * IMAGE_WIDTH;
 
-
 class Image{
+private:
+    vector<double> create_algebraic_vector() const;
 public:
     double pixels[IMAGE_HEIGHT* IMAGE_WIDTH];
     explicit Image(const uint8_t* bytes);
@@ -39,13 +40,14 @@ class Dataset{
 public:
     vector<Pattern> patterns;
     explicit Dataset(const vector<Image>& images, const vector<label>& labels);
-    explicit Dataset(const vector<Pattern> &patterns);
     bool contains_label(label l) const;
-    uint32_t howmany_of_label(label l) const;
     void remove_patterns(const vector<Pattern>& to_remove);
     void preprocess(label l, bool dump_to_file);
     void preprocess_from_dump(label l);
 };
+
+Dataset read_train_dataset();
+Dataset read_test_dataset();
 
 class Perceptron{
 public:
@@ -59,28 +61,19 @@ class PerceptronNetwork{
 private:
     vector<Perceptron> perceptrons;
     uint32_t treshold;
-    bool recognizes(const Pattern& p);
+    bool recognizes(const Pattern& p) const;
+    uint32_t howmany_recognize(const Pattern& p) const;
 public:
     explicit PerceptronNetwork(const vector<Perceptron>& perceptrons, uint32_t treshhold)
     :
     perceptrons(perceptrons), treshold(treshhold) {}
-    double test_on_dataset(const Dataset& dataset, label l, bool print_details);
-    uint32_t howmany_recognize(const Pattern& p);
+    double test_on_dataset(const Dataset& dataset, label l, bool print_details) const;
     void dump_to_file() const;
 };
 
-Dataset read_train_dataset();
-Dataset read_test_dataset();
-
 PerceptronNetwork create_to_recognize(label l, Dataset&& dataset, bool from_preprocessed);
-
 PerceptronNetwork read_from_file();
 
-// todo w ogóle mnóstwo rzeczy jest w jakichś dziwnych nagłówkach np lead_through w dataset
-
-vector<Pattern> get_all_with_same_side_and_label(const Pattern& p, const Hyperplane& h, Dataset& dataset);
-Pattern get_nearest(vector<Pattern>& patterns, const Hyperplane& h);
-
-Hyperplane lead_through(const vector<Pattern>& patterns, const Pattern& target);
+Hyperplane lead_through_or_above(const vector<Pattern>& patterns, const Pattern& target);
 
 #endif //PERCEPTRON_PERCEPTRON_H

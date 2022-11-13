@@ -46,15 +46,30 @@ void Hyperplane::translate_by_vector(const vector<double> &translation_vector) {
     constant_term += dot_product(coefficients_vector, translation_vector);
 }
 
-double average_of_ith_column(const Matrix& matrix, uint32_t column){
-    double sum = 0;
+// See function below for an explanation.
+Hyperplane lead_above(const vector<Pattern>& patterns, const Pattern& target, const Matrix& matrix){
+    vector<double> res;
     for(uint32_t i = 0; i < matrix.size(); ++i){
-        sum += matrix[i][column];
+        res.push_back(target.image.pixels[i] - average_of_ith_column(matrix, i));
     }
-    return sum / (double) matrix.size();
+    double mean_pattern_dot_product = 0;
+    for(auto& p: patterns){
+        mean_pattern_dot_product += dot_product(p.image.to_algebraic_vector(), res);
+    }
+    mean_pattern_dot_product /= (double) patterns.size();
+    double target_dot_product = dot_product(target.image.to_algebraic_vector(), res);
+    assert(target_dot_product > mean_pattern_dot_product);
+    const double MEAN_COEFFICIENT = 0.1;
+    // determines how the constant term will be chosen. Reasonable values are between 0 and 0.5.
+    // Too low will result in too many false positives, too high - in too many false negatives,
+    // when the hyperplane is used to classify images.
+    return {res, mean_pattern_dot_product +
+            MEAN_COEFFICIENT * (target_dot_product - mean_pattern_dot_product)};
 }
 
-Hyperplane lead_through(const vector<Pattern>& patterns, const Pattern& target){
+// Creates either a hyperplane passing through the patterns and with maximum distance to the target,
+// or heuristically - one such that as many patterns as possible are below it, while the target is above it.
+Hyperplane lead_through_or_above(const vector<Pattern>& patterns, const Pattern& target){
     auto matrix = Matrix (IMAGE_SIZE);
     uint32_t row = 0;
     assert(patterns.size() == IMAGE_SIZE);
@@ -70,6 +85,7 @@ Hyperplane lead_through(const vector<Pattern>& patterns, const Pattern& target){
     for(uint32_t i = 0; i < matrix.size(); ++i){
         if(column_has_only_zeroes(matrix, i)){
             res.push_back(target.image.pixels[i]);
+            // This maximizes the distance between the hyperplane and the target.
             if(target.image.pixels[i] != 0){
                 at_least_one_nonzero = true;
             }
@@ -79,27 +95,12 @@ Hyperplane lead_through(const vector<Pattern>& patterns, const Pattern& target){
         }
     }
     if(at_least_one_nonzero){
+        // This means we managed to lead a hyperplane through the target patterns, and not all of its
+        // coefficients were zero.
         return {res, 0.0};
     }
     else{
-        res.clear();
-        for(uint32_t i = 0; i < matrix.size(); ++i){
-            res.push_back(target.image.pixels[i] - average_of_ith_column(matrix, i));
-        }
-        double mean_pattern_dot_product = 0;
-        for(auto& p: patterns){
-            mean_pattern_dot_product += dot_product(p.image.to_algebraic_vector(), res);
-        }
-        mean_pattern_dot_product /= (double) patterns.size();
-        double target_dot_product = dot_product(target.image.to_algebraic_vector(), res);
-        assert(target_dot_product > mean_pattern_dot_product);
-        return {res, mean_pattern_dot_product +
-                     0.2 * (target_dot_product - mean_pattern_dot_product)};
-                     // ^ this can be adjusted, maybe should be 0 bc the
-                     // hyperplane is moved halfway to the target pattern
-                     // anyway later on
-                     // zasadniczo można ten współczynnik dobierać
-                     // dynamicznie za każdym razem, np wypróbowywać
-                     // kilka wartości i patrzeć która działa najlepiej
+        // In this case we were not able to lead the hyperplane through the pattern, and resort to a heuristic.
+        return lead_above(patterns, target, matrix);
     }
 }
