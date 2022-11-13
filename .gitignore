@@ -2,7 +2,6 @@ cmake-build-debug
 .idea
 src/eigen/
 /eigen/
-data/train_hyperplanes_dump.txt
 cmake_install.cmake
 src/CMakeFiles/
 src/CMakeCache.txt
