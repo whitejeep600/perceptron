@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <numeric>
 #include <map>
+#include <fstream>
+#include <cassert>
 #include "perceptron.h"
 #include "hyperplane.h"
 
@@ -88,7 +90,7 @@ vector<Perceptron> create_neurons(label l, Dataset dataset){
 
 // Create a vector of perceptrons to recognize label l based on the dataset. If any of the
 // resulting perceptrons light up for a pattern, it will be assigned the label l.
-PerceptronNetwork create_to_recognize(label l, Dataset& dataset, bool from_preprocessed){
+PerceptronNetwork create_to_recognize(label l, Dataset&& dataset, bool from_preprocessed){
     if(from_preprocessed){
         dataset.preprocess_from_dump(l);
     }
@@ -179,4 +181,55 @@ double PerceptronNetwork::test_on_dataset(const Dataset& dataset, label l, bool 
         cout << "F1 score: " << F1 << ".\n";
     }
     return F1;
+}
+
+void PerceptronNetwork::dump_to_file() const {
+    auto dump_file = ofstream("../data/train_neurons_dump.txt");
+    dump_file << perceptrons.size() << "neurons\n";
+    for(const auto& p: perceptrons){
+        dump_file << "constant " << p.h.constant_term << ", ";
+        dump_file << "positive " << (p.recognizes_positive_side? 1 : 0) << " coefficients ";
+        for (const double c : p.h.coefficients_vector){
+            dump_file << c << " ";
+        }
+        dump_file << "\n";
+    }
+    dump_file << "treshold " << treshold << "\n";
+    dump_file.close();
+}
+
+PerceptronNetwork read_from_file(){
+    auto dump_file = std::ifstream("../data/train_neurons_dump.txt");
+    string input_token;
+    double constant_term;
+    vector<double> coefficients;
+    bool positive;
+    dump_file >> input_token;
+    uint32_t number_of_neurons = stoul(input_token);
+    dump_file >> input_token;
+    assert(input_token == "neurons");
+    auto neurons = vector<Perceptron>();
+    for(uint32_t i = 0; i < number_of_neurons; ++i){
+        coefficients.clear();
+        dump_file >> input_token;
+        assert(input_token == "constant");
+        dump_file >> input_token;
+        constant_term = stod(input_token);
+        dump_file >> input_token;
+        assert(input_token == "positive");
+        dump_file >> input_token;
+        positive = stoul(input_token) == 1;
+        for(uint32_t j = 0; j < IMAGE_SIZE; ++j){
+            dump_file >> input_token;
+            coefficients.push_back(std::stod(input_token));
+        }
+        auto h = Hyperplane{coefficients, constant_term};
+        auto p = Perceptron{h, positive};
+        neurons.push_back(p);
+    }
+    dump_file >> input_token;
+    assert(input_token == "treshold");
+    dump_file >> input_token;
+    uint32_t treshold = stoul(input_token) ;
+    return PerceptronNetwork{neurons, treshold};
 }

@@ -16,7 +16,7 @@ pixels{0}
     }
     for(double & pixel : pixels){
         if(pixel != 0.0){
-            pixel = pixel / max * 2.0 - 1.0; // todo there can be other ways to normalize, e.g. with the mean
+            pixel = pixel / max * 2.0 - 1.0;
         }
     }
 }

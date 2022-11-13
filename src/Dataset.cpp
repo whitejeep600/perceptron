@@ -76,7 +76,7 @@ void Dataset::preprocess(label l, bool dump_to_file) {
     uint32_t i = 0;
     std::ofstream dump_file;
     if(dump_to_file){
-        dump_file = std::ofstream("../data/train_hyperplanes_dump.txt");
+        dump_file = ofstream("../data/train_hyperplanes_dump.txt");
     }
     for(Pattern& p: patterns){
         if(p.l == l) {
@@ -84,7 +84,9 @@ void Dataset::preprocess(label l, bool dump_to_file) {
             p.h = make_shared<Hyperplane>(lead_through(nearest_different_label, p));
             if(dump_to_file){
                 dump_file << "sample number " << i << " constant " << (*(p.h)).constant_term << " vector: ";
-                for (const double c : (*(p.h)).coefficients_vector) dump_file << c << " ";
+                for (const double c : (*(p.h)).coefficients_vector){
+                    dump_file << c << " ";
+                }
                 dump_file << "\n";
                 cout << i << "\n";
             }
@@ -114,7 +116,7 @@ void Dataset::preprocess_from_dump(label l) {
             dump_file >> input_token;
             assert(input_token == "constant");
             dump_file >> input_token;
-            constant_term = std::stod(input_token) ;
+            constant_term = stod(input_token) ;
             dump_file >> input_token;
             assert(input_token == "vector:");
             for(uint32_t j = 0; j < IMAGE_SIZE; ++j){

@@ -12,7 +12,7 @@ using namespace std;
 using label = uint8_t;
 using Matrix = std::vector<std::vector<double>>;
 
-const uint32_t IMAGE_HEIGHT = 28; // todo
+const uint32_t IMAGE_HEIGHT = 28;
 const uint32_t IMAGE_WIDTH = 28;
 const uint32_t IMAGE_SIZE =  IMAGE_HEIGHT * IMAGE_WIDTH;
 
@@ -48,12 +48,11 @@ public:
 };
 
 class Perceptron{
-private:
-    Hyperplane h;
-    bool recognizes_positive_side;
 public:
-    Perceptron(Hyperplane  h, bool on_positive_side);
-    bool recognizes(const Pattern& p);
+    bool recognizes_positive_side;
+    Hyperplane h;
+    Perceptron(Hyperplane h, bool on_positive_side);
+    bool recognizes(const Pattern& p) const;
 };
 
 class PerceptronNetwork{
@@ -64,18 +63,18 @@ private:
 public:
     explicit PerceptronNetwork(const vector<Perceptron>& perceptrons, uint32_t treshhold)
     :
-            perceptrons(perceptrons), treshold(treshhold) {}
+    perceptrons(perceptrons), treshold(treshhold) {}
     double test_on_dataset(const Dataset& dataset, label l, bool print_details);
     uint32_t howmany_recognize(const Pattern& p);
-
+    void dump_to_file() const;
 };
 
 Dataset read_train_dataset();
 Dataset read_test_dataset();
 
-PerceptronNetwork create_to_recognize(label l, Dataset& dataset, bool from_preprocessed);
+PerceptronNetwork create_to_recognize(label l, Dataset&& dataset, bool from_preprocessed);
 
-// todo niepotrzebne rzeczy z naglowkow do wywalenia
+PerceptronNetwork read_from_file();
 
 // todo w ogóle mnóstwo rzeczy jest w jakichś dziwnych nagłówkach np lead_through w dataset
 
@@ -83,4 +82,5 @@ vector<Pattern> get_all_with_same_side_and_label(const Pattern& p, const Hyperpl
 Pattern get_nearest(vector<Pattern>& patterns, const Hyperplane& h);
 
 Hyperplane lead_through(const vector<Pattern>& patterns, const Pattern& target);
+
 #endif //PERCEPTRON_PERCEPTRON_H
