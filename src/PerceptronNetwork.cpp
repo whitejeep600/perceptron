@@ -185,7 +185,7 @@ double PerceptronNetwork::test_on_dataset(const Dataset& dataset, label l, bool 
 
 void PerceptronNetwork::dump_to_file() const {
     auto dump_file = ofstream("../data/train_neurons_dump.txt");
-    dump_file << perceptrons.size() << "neurons\n";
+    dump_file << perceptrons.size() << " neurons\n";
     for(const auto& p: perceptrons){
         dump_file << "constant " << p.h.constant_term << ", ";
         dump_file << "positive " << (p.recognizes_positive_side? 1 : 0) << " coefficients ";
