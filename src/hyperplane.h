@@ -20,5 +20,4 @@ public:
     double distance_to_point(const vector<double>& vec) const;
 };
 
-
 #endif

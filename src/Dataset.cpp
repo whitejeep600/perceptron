@@ -1,10 +1,9 @@
 #include <cassert>
-#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <functional>
+#include <utility>
 #include "perceptron.h"
-#include "utils.h"
 
 Dataset::Dataset(const vector<Image>& images, const vector<label>& labels)
 :
@@ -25,11 +24,6 @@ bool Dataset::contains_label(label l) const {
     return false;
 }
 
-Dataset::Dataset(const vector<Pattern> &patterns)
-:
-patterns(patterns)
-{}
-
 // I know this is ugly but using a hashset or something in cpp is pain :)
 void Dataset::remove_patterns(const vector<Pattern>& to_remove){
     uint32_t temp_size = 0;
@@ -47,7 +41,7 @@ vector<Pattern> get_nearest_with_different_label(const Pattern& pattern, uint32_
     struct key
     {
         Pattern target_pattern;
-        explicit key(Pattern p): target_pattern(p){}
+        explicit key(Pattern p): target_pattern(std::move(p)){}
         bool operator() (const Pattern& pattern1, const Pattern& pattern2) const
         {
             return (pattern1.image.euclidean_distance_squared(target_pattern.image) <
@@ -69,7 +63,6 @@ vector<Pattern> get_nearest_with_different_label(const Pattern& pattern, uint32_
     return result;
 }
 
-
 void Dataset::preprocess(label l, bool dump_to_file) {
     // This only needs to be done once for each pattern while training to recognize a single label.
     // Also if we're being honest it begs for parallelizing, computation for each pattern is independent.
@@ -81,14 +74,14 @@ void Dataset::preprocess(label l, bool dump_to_file) {
     for(Pattern& p: patterns){
         if(p.l == l) {
             vector<Pattern> nearest_different_label = get_nearest_with_different_label(p, 784, *this);
-            p.h = make_shared<Hyperplane>(lead_through(nearest_different_label, p));
+            p.h = make_shared<Hyperplane>(lead_through_or_above(nearest_different_label, p));
             if(dump_to_file){
                 dump_file << "sample number " << i << " constant " << (*(p.h)).constant_term << " vector: ";
                 for (const double c : (*(p.h)).coefficients_vector){
                     dump_file << c << " ";
                 }
                 dump_file << "\n";
-                cout << i << "\n";
+                cout << "preprocessed pattern number " << i << "\n";
             }
         }
         ++i;
@@ -127,18 +120,7 @@ void Dataset::preprocess_from_dump(label l) {
         }
         ++i;
     }
-    // assert(!(dump_file >> constant_term)); // making sure everything was read from the file todo
     dump_file.close();
-}
-
-uint32_t Dataset::howmany_of_label(label l) const {
-    uint32_t res = 0;
-    for(Pattern p: this->patterns){
-        if(p.l == l){
-            ++ res;
-        }
-    }
-    return res;
 }
 
 
