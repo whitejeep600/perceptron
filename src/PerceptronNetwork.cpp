@@ -173,6 +173,8 @@ PerceptronNetwork read_from_file(){
         assert(input_token == "positive");
         dump_file >> input_token;
         positive = stoul(input_token) == 1;
+        dump_file >> input_token;
+        assert(input_token == "coefficients");
         for(uint32_t j = 0; j < IMAGE_SIZE; ++j){
             dump_file >> input_token;
             coefficients.push_back(std::stod(input_token));

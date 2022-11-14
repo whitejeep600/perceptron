@@ -26,7 +26,8 @@ constant_term(0)
 {}
 
 bool Hyperplane::on_positive_side(const vector<double>& vec) const {
-    return dot_product(coefficients_vector, vec) > constant_term;
+    auto dupa = dot_product(coefficients_vector, vec);
+    return dupa > constant_term;
 }
 
 bool Hyperplane::on_same_side(const vector<double> &vec1, const vector<double> &vec2) const {

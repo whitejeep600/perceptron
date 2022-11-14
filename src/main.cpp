@@ -25,6 +25,14 @@ int main(int argc, char** argv) {
         network.dump_to_file();
         cout << "Testing on the test dataset.\n";
         network.test_on_dataset(read_test_dataset(), l, true);
+        for(auto& p: network.perceptrons){
+            cout << "constant";
+            cout << p.h.constant_term;
+            cout << "positive" << p.recognizes_positive_side << " ";
+            for(auto r: p.h.coefficients_vector){
+                cout << r << " ";;
+            }
+        }
     }
     else{
         auto network = read_from_file();

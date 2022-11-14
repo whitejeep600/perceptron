@@ -53,22 +53,24 @@ class Perceptron{
 public:
     bool recognizes_positive_side;
     Hyperplane h;
-    Perceptron(Hyperplane h, bool on_positive_side);
+    Perceptron(const Hyperplane& h, bool on_positive_side);
     bool recognizes(const Pattern& p) const;
 };
 
 class PerceptronNetwork{
 private:
-    vector<Perceptron> perceptrons;
     uint32_t treshold;
     bool recognizes(const Pattern& p) const;
     uint32_t howmany_recognize(const Pattern& p) const;
+
 public:
+    vector<Perceptron> perceptrons;
     explicit PerceptronNetwork(const vector<Perceptron>& perceptrons, uint32_t treshhold)
     :
-    perceptrons(perceptrons), treshold(treshhold) {}
+    treshold(treshhold), perceptrons(perceptrons)  {}
     double test_on_dataset(const Dataset& dataset, label l, bool print_details) const;
     void dump_to_file() const;
+
 };
 
 PerceptronNetwork create_to_recognize(label l, Dataset&& dataset, bool from_preprocessed);
