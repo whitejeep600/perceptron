@@ -69,12 +69,9 @@ public:
     :
     treshold(treshhold), perceptrons(perceptrons)  {}
     double test_on_dataset(const Dataset& dataset, label l, bool print_details) const;
-    void dump_to_file() const;
-
 };
 
 PerceptronNetwork create_to_recognize(label l, Dataset&& dataset, bool from_preprocessed);
-PerceptronNetwork read_from_file();
 
 Hyperplane lead_through_or_above(const vector<Pattern>& patterns, const Pattern& target);
 
